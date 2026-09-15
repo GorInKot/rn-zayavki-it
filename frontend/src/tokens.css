@@ -1,0 +1,119 @@
+/* Design Tokens - Auto-generated */
+/* Do not edit directly - modify tokens.json instead */
+
+/* === PRIMITIVES === */
+:root {
+  --primitive-color-brand-100: #fdf8d3;
+  --primitive-color-brand-500: #f5d80b;
+  --primitive-color-brand-600: #d8be0a;
+  --primitive-color-ink-100: #eceef1;
+  --primitive-color-ink-300: #b9b9b9;
+  --primitive-color-ink-500: #5c6068;
+  --primitive-color-ink-700: #393939;
+  --primitive-color-ink-900: #010206;
+  --primitive-color-surface-0: #ffffff;
+  --primitive-color-surface-50: #f7f8fa;
+  --primitive-color-surface-100: #f2f3f5;
+  --primitive-color-charcoal-900: #010206;
+  --primitive-color-focus-500: #1f5fbf;
+  --primitive-color-danger-100: #fdecea;
+  --primitive-color-danger-600: #b42318;
+  --primitive-color-success-100: #e3f2e9;
+  --primitive-color-success-700: #16603e;
+  --primitive-color-warning-100: #fdebd6;
+  --primitive-color-warning-800: #8a4300;
+  --primitive-color-info-100: #e5edfb;
+  --primitive-color-info-700: #1d4e9e;
+  --primitive-color-status-review-fg: #704c00;
+  --primitive-color-status-review-bg: #fff0c7;
+  --primitive-color-status-clarification-bg: #fde6cc;
+  --primitive-color-status-work-bg: #e3ecfb;
+  --primitive-color-status-done-bg: #dff1e6;
+  --primitive-color-status-neutral-fg: #454950;
+  --primitive-color-status-neutral-bg: #eaecef;
+  --primitive-color-status-rejected-fg: #a1271e;
+  --primitive-color-status-rejected-bg: #fbe3e0;
+  --primitive-radius-sm: 6px;
+  --primitive-radius-default: 8px;
+  --primitive-shadow-default: 0 1px 2px rgba(20, 22, 28, 0.06);
+  --primitive-shadow-raised: 0 12px 32px rgba(20, 22, 28, 0.18);
+  --primitive-font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --primitive-font-mono: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+}
+
+/* === SEMANTIC === */
+:root {
+  --brand: #f5d80b;
+  --brand-hover: #d8be0a;
+  --brand-soft: #fdf8d3;
+  --ink: #010206;
+  --ink-2: #393939;
+  --muted: #5c6068;
+  --line: #b9b9b9;
+  --line-soft: #eceef1;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --ground: #f2f3f5;
+  --charcoal: #010206;
+  --focus: #1f5fbf;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --success: #16603e;
+  --success-soft: #e3f2e9;
+  --warning: #8a4300;
+  --warning-soft: #fdebd6;
+  --info: #1d4e9e;
+  --info-soft: #e5edfb;
+  --st-review-fg: #704c00;
+  --st-review-bg: #fff0c7;
+  --st-clarification-fg: #8a4300;
+  --st-clarification-bg: #fde6cc;
+  --st-work-fg: #1d4e9e;
+  --st-work-bg: #e3ecfb;
+  --st-done-fg: #16603e;
+  --st-done-bg: #dff1e6;
+  --st-neutral-fg: #454950;
+  --st-neutral-bg: #eaecef;
+  --st-rejected-fg: #a1271e;
+  --st-rejected-bg: #fbe3e0;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(20, 22, 28, 0.06);
+  --shadow-raised: 0 12px 32px rgba(20, 22, 28, 0.18);
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+}
+
+/* === COMPONENTS === */
+:root {
+  --button-radius: 6px;
+  --button-padding-x: 16px;
+  --button-padding-y: 9px;
+  --button-font-size: 14px;
+  --button-primary-bg: #f5d80b;
+  --button-primary-bg-hover: #d8be0a;
+  --button-primary-fg: #010206;
+  --button-secondary-bg: #ffffff;
+  --button-secondary-border: #b9b9b9;
+  --button-secondary-border-hover: #aeb2ba;
+  --button-danger-border: #e3b4ae;
+  --button-danger-fg: #b42318;
+  --button-danger-bg-hover: #fdecea;
+  --input-border: #c4c8cf;
+  --input-border-invalid: #b42318;
+  --input-focus-ring: #1f5fbf;
+  --input-bg: #ffffff;
+  --input-bg-readonly: #f7f8fa;
+  --input-radius: 6px;
+  --input-padding-x: 12px;
+  --input-padding-y: 9px;
+  --card-bg: #ffffff;
+  --card-border: #b9b9b9;
+  --card-shadow: 0 1px 2px rgba(20, 22, 28, 0.06);
+  --card-radius: 8px;
+  --card-padding: 22px 24px;
+  --badge-radius: 999px;
+  --badge-padding-x: 10px;
+  --badge-padding-y: 3px;
+  --badge-font-size: 12.5px;
+}

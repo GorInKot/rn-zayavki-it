@@ -1,0 +1,154 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "primitive": {
+    "color": {
+      "brand": {
+        "100": { "$value": "#fdf8d3", "$type": "color", "$description": "Корпоративный жёлтый, светлая подложка (вычислено: 82% к белому)" },
+        "500": { "$value": "#f5d80b", "$type": "color", "$description": "Корпоративный жёлтый" },
+        "600": { "$value": "#d8be0a", "$type": "color", "$description": "Корпоративный жёлтый, hover (вычислено: 12% к чёрному)" }
+      },
+      "ink": {
+        "900": { "$value": "#010206", "$type": "color", "$description": "Корпоративный чёрный" },
+        "700": { "$value": "#393939", "$type": "color", "$description": "Корпоративный тёмно-серый" },
+        "500": { "$value": "#5c6068", "$type": "color", "$description": "Приглушённый текст — своего корпоративного оттенка нет, оставлен прежним ради контраста (AA)" },
+        "300": { "$value": "#b9b9b9", "$type": "color", "$description": "Корпоративный серый" },
+        "100": { "$value": "#eceef1", "$type": "color" }
+      },
+      "surface": {
+        "0": { "$value": "#ffffff", "$type": "color", "$description": "Корпоративный белый" },
+        "50": { "$value": "#f7f8fa", "$type": "color" },
+        "100": { "$value": "#f2f3f5", "$type": "color" }
+      },
+      "charcoal": {
+        "900": { "$value": "{primitive.color.ink.900}", "$type": "color", "$description": "Корпоративный чёрный (общий с ink.900)" }
+      },
+      "focus": {
+        "500": { "$value": "#1f5fbf", "$type": "color" }
+      },
+      "danger": {
+        "100": { "$value": "#fdecea", "$type": "color" },
+        "600": { "$value": "#b42318", "$type": "color" }
+      },
+      "success": {
+        "100": { "$value": "#e3f2e9", "$type": "color" },
+        "700": { "$value": "#16603e", "$type": "color" }
+      },
+      "warning": {
+        "100": { "$value": "#fdebd6", "$type": "color" },
+        "800": { "$value": "#8a4300", "$type": "color" }
+      },
+      "info": {
+        "100": { "$value": "#e5edfb", "$type": "color" },
+        "700": { "$value": "#1d4e9e", "$type": "color" }
+      },
+      "status": {
+        "review-fg": { "$value": "#704c00", "$type": "color" },
+        "review-bg": { "$value": "#fff0c7", "$type": "color" },
+        "clarification-bg": { "$value": "#fde6cc", "$type": "color" },
+        "work-bg": { "$value": "#e3ecfb", "$type": "color" },
+        "done-bg": { "$value": "#dff1e6", "$type": "color" },
+        "neutral-fg": { "$value": "#454950", "$type": "color" },
+        "neutral-bg": { "$value": "#eaecef", "$type": "color" },
+        "rejected-fg": { "$value": "#a1271e", "$type": "color" },
+        "rejected-bg": { "$value": "#fbe3e0", "$type": "color" }
+      }
+    },
+    "radius": {
+      "sm": { "$value": "6px", "$type": "dimension" },
+      "default": { "$value": "8px", "$type": "dimension" }
+    },
+    "shadow": {
+      "default": { "$value": "0 1px 2px rgba(20, 22, 28, 0.06)", "$type": "shadow" },
+      "raised": { "$value": "0 12px 32px rgba(20, 22, 28, 0.18)", "$type": "shadow" }
+    },
+    "font": {
+      "sans": { "$value": "\"Segoe UI\", system-ui, -apple-system, \"Helvetica Neue\", Arial, sans-serif", "$type": "fontFamily" },
+      "mono": { "$value": "\"Cascadia Mono\", Consolas, \"SF Mono\", Menlo, monospace", "$type": "fontFamily" }
+    }
+  },
+
+  "semantic": {
+    "brand": { "$value": "{primitive.color.brand.500}", "$type": "color" },
+    "brand-hover": { "$value": "{primitive.color.brand.600}", "$type": "color" },
+    "brand-soft": { "$value": "{primitive.color.brand.100}", "$type": "color" },
+    "ink": { "$value": "{primitive.color.ink.900}", "$type": "color" },
+    "ink-2": { "$value": "{primitive.color.ink.700}", "$type": "color" },
+    "muted": { "$value": "{primitive.color.ink.500}", "$type": "color" },
+    "line": { "$value": "{primitive.color.ink.300}", "$type": "color" },
+    "line-soft": { "$value": "{primitive.color.ink.100}", "$type": "color" },
+    "surface": { "$value": "{primitive.color.surface.0}", "$type": "color" },
+    "surface-2": { "$value": "{primitive.color.surface.50}", "$type": "color" },
+    "ground": { "$value": "{primitive.color.surface.100}", "$type": "color" },
+    "charcoal": { "$value": "{primitive.color.charcoal.900}", "$type": "color" },
+    "focus": { "$value": "{primitive.color.focus.500}", "$type": "color" },
+    "danger": { "$value": "{primitive.color.danger.600}", "$type": "color" },
+    "danger-soft": { "$value": "{primitive.color.danger.100}", "$type": "color" },
+    "success": { "$value": "{primitive.color.success.700}", "$type": "color" },
+    "success-soft": { "$value": "{primitive.color.success.100}", "$type": "color" },
+    "warning": { "$value": "{primitive.color.warning.800}", "$type": "color" },
+    "warning-soft": { "$value": "{primitive.color.warning.100}", "$type": "color" },
+    "info": { "$value": "{primitive.color.info.700}", "$type": "color" },
+    "info-soft": { "$value": "{primitive.color.info.100}", "$type": "color" },
+
+    "st-review-fg": { "$value": "{primitive.color.status.review-fg}", "$type": "color" },
+    "st-review-bg": { "$value": "{primitive.color.status.review-bg}", "$type": "color" },
+    "st-clarification-fg": { "$value": "{primitive.color.warning.800}", "$type": "color" },
+    "st-clarification-bg": { "$value": "{primitive.color.status.clarification-bg}", "$type": "color" },
+    "st-work-fg": { "$value": "{primitive.color.info.700}", "$type": "color" },
+    "st-work-bg": { "$value": "{primitive.color.status.work-bg}", "$type": "color" },
+    "st-done-fg": { "$value": "{primitive.color.success.700}", "$type": "color" },
+    "st-done-bg": { "$value": "{primitive.color.status.done-bg}", "$type": "color" },
+    "st-neutral-fg": { "$value": "{primitive.color.status.neutral-fg}", "$type": "color" },
+    "st-neutral-bg": { "$value": "{primitive.color.status.neutral-bg}", "$type": "color" },
+    "st-rejected-fg": { "$value": "{primitive.color.status.rejected-fg}", "$type": "color" },
+    "st-rejected-bg": { "$value": "{primitive.color.status.rejected-bg}", "$type": "color" },
+
+    "radius": { "$value": "{primitive.radius.default}", "$type": "dimension" },
+    "radius-sm": { "$value": "{primitive.radius.sm}", "$type": "dimension" },
+    "shadow": { "$value": "{primitive.shadow.default}", "$type": "shadow" },
+    "shadow-raised": { "$value": "{primitive.shadow.raised}", "$type": "shadow" },
+    "font": { "$value": "{primitive.font.sans}", "$type": "fontFamily" },
+    "mono": { "$value": "{primitive.font.mono}", "$type": "fontFamily" }
+  },
+
+  "component": {
+    "button": {
+      "radius": { "$value": "{semantic.radius-sm}", "$type": "dimension" },
+      "padding-x": { "$value": "16px", "$type": "dimension" },
+      "padding-y": { "$value": "9px", "$type": "dimension" },
+      "font-size": { "$value": "14px", "$type": "dimension" },
+      "primary-bg": { "$value": "{semantic.brand}", "$type": "color" },
+      "primary-bg-hover": { "$value": "{semantic.brand-hover}", "$type": "color" },
+      "primary-fg": { "$value": "{semantic.ink}", "$type": "color" },
+      "secondary-bg": { "$value": "{semantic.surface}", "$type": "color" },
+      "secondary-border": { "$value": "{semantic.line}", "$type": "color" },
+      "secondary-border-hover": { "$value": "#aeb2ba", "$type": "color" },
+      "danger-border": { "$value": "#e3b4ae", "$type": "color" },
+      "danger-fg": { "$value": "{semantic.danger}", "$type": "color" },
+      "danger-bg-hover": { "$value": "{semantic.danger-soft}", "$type": "color" }
+    },
+    "input": {
+      "border": { "$value": "#c4c8cf", "$type": "color" },
+      "border-invalid": { "$value": "{semantic.danger}", "$type": "color" },
+      "focus-ring": { "$value": "{semantic.focus}", "$type": "color" },
+      "bg": { "$value": "{semantic.surface}", "$type": "color" },
+      "bg-readonly": { "$value": "{semantic.surface-2}", "$type": "color" },
+      "radius": { "$value": "{semantic.radius-sm}", "$type": "dimension" },
+      "padding-x": { "$value": "12px", "$type": "dimension" },
+      "padding-y": { "$value": "9px", "$type": "dimension" }
+    },
+    "card": {
+      "bg": { "$value": "{semantic.surface}", "$type": "color" },
+      "border": { "$value": "{semantic.line}", "$type": "color" },
+      "shadow": { "$value": "{semantic.shadow}", "$type": "shadow" },
+      "radius": { "$value": "{semantic.radius}", "$type": "dimension" },
+      "padding": { "$value": "22px 24px", "$type": "dimension" }
+    },
+    "badge": {
+      "radius": { "$value": "999px", "$type": "dimension" },
+      "padding-x": { "$value": "10px", "$type": "dimension" },
+      "padding-y": { "$value": "3px", "$type": "dimension" },
+      "font-size": { "$value": "12.5px", "$type": "dimension" }
+    }
+  }
+}

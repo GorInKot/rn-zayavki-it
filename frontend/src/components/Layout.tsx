@@ -53,7 +53,7 @@ export function Layout() {
           <Link to="/" className="topbar__title">
             <span className="topbar__mark" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 14 14">
-                <path d="M1 1h12v2.4H1zm0 4.8h12v2.4H1zm0 4.8h7.5V13H1z" fill="#1b1c20" />
+                <path d="M1 1h12v2.4H1zm0 4.8h12v2.4H1zm0 4.8h7.5V13H1z" fill="#010206" />
               </svg>
             </span>
             Заявки на автоматизацию
