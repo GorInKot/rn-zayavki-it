@@ -1,0 +1,37 @@
+server {
+    listen 80;
+    server_name _;
+    server_tokens off;
+    client_max_body_size 25m;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "same-origin" always;
+
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location ${APP_BASE_PATH}api/ {
+        proxy_pass ${BACKEND_URL}/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+
+    location ${APP_BASE_PATH}assets/ {
+        root /usr/share/nginx/html;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location ${APP_BASE_PATH} {
+        root /usr/share/nginx/html;
+        # index.html не кешируется, чтобы после обновления сразу подхватывались новые файлы.
+        add_header Cache-Control "no-cache";
+        try_files $uri ${APP_BASE_PATH}index.html;
+    }
+}

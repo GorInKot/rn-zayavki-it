@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Система заявок на автоматизацию</title>
+<style>
+/* ==========================================================================
+   ДИЗАЙН-ТОКЕНЫ
+   ========================================================================== */
+:root{
+  --yellow:#FBBB00;
+  --yellow-deep:#E2A400;
+  --yellow-soft:#FFF3D6;
+  --ink:#1A1A1D;
+  --charcoal:#2B2C31;
+  --gray-700:#4B4E56;
+  --gray-600:#6C6F76;
+  --gray-400:#9CA0A8;
+  --gray-200:#DEE1E6;
+  --gray-150:#E9EBEF;
+  --gray-100:#F1F2F5;
+  --surface:#FFFFFF;
+  --bg:#F5F6F8;
+  --green:#1E8E5A; --green-bg:#E6F5EE;
+  --red:#D6483F;   --red-bg:#FBEAE9;
+  --orange:#DB8A1E;--orange-bg:#FCF0DE;
+  --blue:#3568C7;  --blue-bg:#EAF0FB;
+  --gray-badge-bg:#EEEFF2;
+  --radius-lg:14px;
+  --radius-md:10px;
+  --radius-sm:7px;
+  --shadow-sm:0 1px 2px rgba(15,15,20,.06);
+  --shadow-md:0 4px 16px rgba(15,15,20,.08);
+  --shadow-lg:0 12px 32px rgba(15,15,20,.14);
+  --font:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.01em;}
+p{margin:0;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;font-size:14px;}
+a{color:inherit;}
+::selection{background:var(--yellow-soft);}
+
+/* ==========================================================================
+   ЛЭЙАУТ / ШАПКА
+   ========================================================================== */
+#app-header{
+  background:var(--charcoal);
+  color:#fff;
+  padding:14px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  position:sticky;
+  top:0;
+  z-index:40;
+  box-shadow:var(--shadow-md);
+}
+.header-left{display:flex;align-items:center;gap:14px;cursor:pointer;}
+.header-logo{
+  width:38px;height:38px;border-radius:9px;
+  background:var(--yellow);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:var(--ink);font-size:16px;flex:none;
+}
+.header-titles h1{font-size:16px;color:#fff;}
+.header-titles p{font-size:11.5px;color:#B7BAC2;margin-top:2px;}
+.header-nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.nav-btn{
+  background:transparent;border:none;color:#C6C9D0;
+  padding:9px 14px;border-radius:8px;font-size:13.5px;font-weight:600;
+  transition:background .15s, color .15s;
+}
+.nav-btn:hover{background:#3a3b41;color:#fff;}
+.nav-btn.active{background:var(--yellow);color:var(--ink);}
+.header-right{display:flex;align-items:center;gap:14px;}
+.role-switch{
+  display:flex;background:#3a3b41;border-radius:9px;padding:3px;gap:2px;
+}
+.role-switch button{
+  border:none;background:transparent;color:#C6C9D0;padding:7px 13px;
+  border-radius:7px;font-size:12.5px;font-weight:600;transition:.15s;
+}
+.role-switch button.active{background:var(--yellow);color:var(--ink);}
+.reset-link{
+  background:transparent;border:1px solid #4c4e55;color:#B7BAC2;
+  padding:7px 11px;border-radius:8px;font-size:12px;font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.reset-link:hover{border-color:#6c6e76;color:#fff;}
+.role-note{font-size:10.5px;color:#8d909a;max-width:120px;line-height:1.3;}
+
+#app-root{max-width:1180px;margin:0 auto;padding:28px 28px 80px;}
+@media (max-width:720px){
+  #app-header{padding:12px 14px;flex-wrap:wrap;}
+  #app-root{padding:16px 14px 60px;}
+  .header-titles p{display:none;}
+}
+
+/* ==========================================================================
+   ОБЩИЕ КОМПОНЕНТЫ
+   ========================================================================== */
+.btn{
+  border-radius:9px;border:1px solid transparent;padding:11px 20px;
+  font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
+  transition:transform .08s ease, background .15s, box-shadow .15s, border-color .15s;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--yellow);color:var(--ink);box-shadow:var(--shadow-sm);}
+.btn-primary:hover{background:var(--yellow-deep);}
+.btn-primary:disabled{background:var(--gray-200);color:var(--gray-400);cursor:not-allowed;}
+.btn-dark{background:var(--ink);color:#fff;}
+.btn-dark:hover{background:#000;}
+.btn-secondary{background:#fff;color:var(--ink);border-color:var(--gray-200);}
+.btn-secondary:hover{border-color:var(--gray-400);background:var(--gray-100);}
+.btn-ghost{background:transparent;color:var(--gray-700);border-color:transparent;padding:8px 12px;}
+.btn-ghost:hover{background:var(--gray-100);}
+.btn-danger{background:#fff;color:var(--red);border-color:#eecbc8;}
+.btn-danger:hover{background:var(--red-bg);}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:7px;}
+.btn-block{width:100%;justify-content:center;}
+
+.card{
+  background:var(--surface);border:1px solid var(--gray-150);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);
+  padding:24px;
+}
+.card + .card{margin-top:16px;}
+.section-title{font-size:15px;font-weight:700;margin-bottom:4px;}
+.section-sub{font-size:12.5px;color:var(--gray-600);margin-bottom:16px;}
+.hint{font-size:12px;color:var(--gray-600);margin-top:6px;line-height:1.45;}
+.hint b{color:var(--gray-700);}
+
+label.field-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--charcoal);}
+.required-mark{color:var(--red);margin-left:2px;}
+.field-block{margin-bottom:18px;}
+.field-block:last-child{margin-bottom:0;}
+.input,.select,.textarea{
+  width:100%;border:1.5px solid var(--gray-200);border-radius:9px;
+  padding:10px 13px;font-size:14px;color:var(--ink);background:#fff;
+  transition:border-color .15s, box-shadow .15s;
+}
+.input:focus,.select:focus,.textarea:focus{
+  outline:none;border-color:var(--yellow-deep);box-shadow:0 0 0 3px var(--yellow-soft);
+}
+.textarea{resize:vertical;min-height:88px;line-height:1.5;}
+.input.invalid,.select.invalid,.textarea.invalid{border-color:var(--red);}
+.field-error{color:var(--red);font-size:12px;margin-top:6px;display:flex;align-items:center;gap:5px;}
+.field-row{display:flex;gap:12px;flex-wrap:wrap;}
+.field-row > *{flex:1;min-width:180px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media (max-width:640px){.two-col{grid-template-columns:1fr;}}
+
+.checkbox-row{display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+.checkbox-row input[type=checkbox]{margin-top:3px;width:17px;height:17px;accent-color:var(--yellow-deep);flex:none;}
+.checkbox-row span{font-size:13.5px;color:var(--charcoal);}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;
+  font-size:11.5px;font-weight:700;white-space:nowrap;
+}
+.st-gray{background:var(--gray-badge-bg);color:var(--gray-700);}
+.st-blue{background:var(--blue-bg);color:var(--blue);}
+.st-yellow{background:var(--yellow-soft);color:#8a6300;}
+.st-orange{background:var(--orange-bg);color:var(--orange);}
+.st-green{background:var(--green-bg);color:var(--green);}
+.st-red{background:var(--red-bg);color:var(--red);}
+
+.tag-topic{
+  background:var(--gray-100);border:1px solid var(--gray-200);color:var(--gray-700);
+  font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;
+}
+
+/* Toasts */
+#toast-container{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:10px;max-width:340px;}
+.toast{
+  background:var(--ink);color:#fff;padding:13px 16px;border-radius:10px;font-size:13px;
+  box-shadow:var(--shadow-lg);display:flex;gap:10px;align-items:flex-start;
+  animation:toast-in .2s ease;
+}
+.toast.warn{background:#5c3d00;}
+.toast .dot{width:8px;height:8px;border-radius:50%;background:var(--yellow);margin-top:5px;flex:none;}
+@keyframes toast-in{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.toast.fade-out{animation:toast-out .25s ease forwards;}
+@keyframes toast-out{to{opacity:0;transform:translateY(-8px);}}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(20,20,22,.5);z-index:150;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fade-in .15s ease;
+}
+@keyframes fade-in{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);
+  width:100%;max-width:460px;padding:24px;max-height:88vh;overflow:auto;
+}
+.modal h3{font-size:17px;margin-bottom:6px;}
+.modal .modal-sub{font-size:13px;color:var(--gray-600);margin-bottom:18px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+/* Stepper (форма подачи заявки) */
+.stepper-wrap{background:#fff;border:1px solid var(--gray-150);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
+.stepper{display:flex;align-items:flex-start;gap:2px;overflow-x:auto;padding-bottom:4px;}
+.step-item{display:flex;flex-direction:column;align-items:center;flex:1;min-width:78px;position:relative;}
+.step-circle{
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;font-weight:700;border:2px solid var(--gray-200);color:var(--gray-400);background:#fff;
+  transition:.2s;z-index:2;
+}
+.step-item.completed .step-circle{background:var(--ink);border-color:var(--ink);color:#fff;}
+.step-item.current .step-circle{background:var(--yellow);border-color:var(--yellow-deep);color:var(--ink);box-shadow:0 0 0 4px var(--yellow-soft);}
+.step-label{font-size:11px;margin-top:7px;color:var(--gray-400);text-align:center;font-weight:600;max-width:90px;}
+.step-item.completed .step-label,.step-item.current .step-label{color:var(--ink);}
+.step-line{position:absolute;top:15px;left:calc(-50% + 15px);right:calc(50% + 15px);height:2px;background:var(--gray-200);z-index:1;}
+.step-item.completed .step-line{background:var(--ink);}
+.step-item:first-child .step-line{display:none;}
+.progress-bar-outer{height:6px;background:var(--gray-100);border-radius:99px;margin-top:16px;overflow:hidden;}
+.progress-bar-inner{height:100%;background:var(--yellow);border-radius:99px;transition:width .25s ease;}
+.progress-label{font-size:11.5px;color:var(--gray-600);margin-top:7px;font-weight:600;}
+
+/* Lifecycle timeline (карточка заявки) */
+.lifecycle{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:6px 2px 10px;}
+.lc-item{display:flex;flex-direction:column;align-items:center;min-width:96px;flex:1;position:relative;}
+.lc-dot{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--gray-200);z-index:2;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gray-400);}
+.lc-item.done .lc-dot{background:var(--green);border-color:var(--green);color:#fff;}
+.lc-item.current .lc-dot{background:var(--yellow);border-color:var(--yellow-deep);color:var(--ink);box-shadow:0 0 0 4px var(--yellow-soft);}
+.lc-line{position:absolute;top:12px;left:calc(-50% + 13px);right:calc(50% + 13px);height:2px;background:var(--gray-200);z-index:1;}
+.lc-item.done .lc-line{background:var(--green);}
+.lc-item:first-child .lc-line{display:none;}
+.lc-label{font-size:11px;margin-top:6px;text-align:center;color:var(--gray-500);font-weight:600;max-width:100px;}
+.lc-item.done .lc-label,.lc-item.current .lc-label{color:var(--ink);}
+.lc-branch{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:12.5px;display:flex;gap:8px;}
+.lc-branch.orange{background:var(--orange-bg);color:#7a5312;}
+.lc-branch.red{background:var(--red-bg);color:#7d211c;}
+
+/* Reg cards / dropzone */
+.choice-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media (max-width:640px){.choice-cards{grid-template-columns:1fr;}}
+.choice-card{
+  border:1.5px solid var(--gray-200);border-radius:12px;padding:16px;cursor:pointer;
+  transition:.15s;background:#fff;
+}
+.choice-card:hover{border-color:var(--gray-400);}
+.choice-card.selected{border-color:var(--yellow-deep);background:var(--yellow-soft);box-shadow:0 0 0 1px var(--yellow-deep);}
+.choice-card .cc-title{font-weight:700;font-size:14px;margin-bottom:4px;}
+.choice-card .cc-sub{font-size:12px;color:var(--gray-600);}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.topic-chip{
+  border:1.5px solid var(--gray-200);border-radius:10px;padding:11px 12px;cursor:pointer;
+  font-size:13px;font-weight:600;text-align:center;transition:.15s;background:#fff;
+}
+.topic-chip:hover{border-color:var(--gray-400);}
+.topic-chip.selected{border-color:var(--yellow-deep);background:var(--yellow-soft);}
+
+.dropzone{
+  border:2px dashed var(--gray-200);border-radius:12px;padding:26px;text-align:center;
+  color:var(--gray-600);font-size:13px;transition:.15s;background:var(--gray-100);
+}
+.dropzone.drag{border-color:var(--yellow-deep);background:var(--yellow-soft);}
+.link-btn{color:var(--blue);font-weight:700;text-decoration:underline;cursor:pointer;}
+.file-item{
+  border:1px solid var(--gray-150);border-radius:10px;padding:14px;margin-top:10px;background:var(--gray-100);
+}
+.file-item-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.file-icon{width:34px;height:34px;border-radius:8px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;flex:none;}
+.file-meta{flex:1;min-width:0;}
+.file-name{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-size{font-size:11.5px;color:var(--gray-600);}
+
+/* Таблицы */
+.table-wrap{overflow-x:auto;}
+table.reg-table{width:100%;border-collapse:collapse;font-size:13px;min-width:920px;}
+table.reg-table th{
+  text-align:left;padding:10px 12px;color:var(--gray-600);font-weight:700;font-size:11.5px;
+  text-transform:none;border-bottom:2px solid var(--gray-150);white-space:nowrap;cursor:pointer;user-select:none;
+}
+table.reg-table th:hover{color:var(--ink);}
+table.reg-table td{padding:12px;border-bottom:1px solid var(--gray-100);vertical-align:middle;}
+table.reg-table tr:hover td{background:var(--gray-100);}
+tr.row-warning td{background:var(--orange-bg);}
+tr.row-overdue td{background:var(--red-bg);}
+.mono-num{font-weight:700;font-family:'Consolas',monospace;font-size:12.5px;}
+
+/* Карточки списков заявок */
+.req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+.req-card{
+  background:#fff;border:1px solid var(--gray-150);border-radius:var(--radius-md);padding:18px;
+  box-shadow:var(--shadow-sm);cursor:pointer;transition:.15s;
+}
+.req-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);border-color:var(--gray-200);}
+.req-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;}
+.req-num{font-family:'Consolas',monospace;font-weight:700;font-size:12.5px;color:var(--gray-600);}
+.req-title{font-size:14px;font-weight:700;margin:4px 0 8px;line-height:1.35;}
+.req-meta-row{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-100);}
+
+/* Пустое состояние */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state .es-icon{font-size:40px;margin-bottom:14px;}
+.empty-state h3{font-size:16px;margin-bottom:8px;}
+.empty-state p{color:var(--gray-600);font-size:13.5px;margin-bottom:20px;}
+
+/* Дашборд */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
+.kpi-card{background:#fff;border:1px solid var(--gray-150);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm);}
+.kpi-value{font-size:26px;font-weight:800;line-height:1;}
+.kpi-label{font-size:12px;color:var(--gray-600);margin-top:8px;font-weight:600;}
+.kpi-card.accent{border-color:var(--yellow-deep);background:linear-gradient(180deg,#fff,var(--yellow-soft));}
+.kpi-card.warn .kpi-value{color:var(--red);}
+
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.bar-label{width:130px;font-size:12.5px;color:var(--gray-700);flex:none;font-weight:600;}
+.bar-track{flex:1;height:16px;background:var(--gray-100);border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--yellow);border-radius:6px;transition:width .4s ease;}
+.bar-value{width:28px;text-align:right;font-size:12.5px;font-weight:700;flex:none;}
+
+/* Hero / home */
+.hero{
+  background:linear-gradient(135deg,var(--ink) 0%,#3a3a3f 100%);
+  border-radius:var(--radius-lg);padding:44px 40px;color:#fff;margin-bottom:22px;
+  position:relative;overflow:hidden;
+}
+.hero::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:var(--yellow);opacity:.12;border-radius:50%;}
+.hero h2{font-size:26px;margin-bottom:10px;max-width:560px;position:relative;}
+.hero p{color:#C6C9D0;font-size:14px;max-width:520px;position:relative;line-height:1.6;}
+.hero-actions{display:flex;gap:12px;margin-top:22px;position:relative;flex-wrap:wrap;}
+
+.info-strip{
+  background:#fff;border:1px solid var(--gray-150);border-radius:var(--radius-md);
+  padding:16px 18px;font-size:13px;color:var(--gray-700);display:flex;gap:12px;align-items:flex-start;
+}
+.info-strip .ii{font-size:18px;}
+
+.draft-banner{
+  background:var(--yellow-soft);border:1px solid var(--yellow-deep);border-radius:var(--radius-md);
+  padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap;
+}
+.draft-banner strong{font-size:13.5px;}
+.draft-banner span{font-size:12.5px;color:#6b4f00;}
+
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
+.page-head h2{font-size:21px;}
+.page-head .ph-sub{font-size:13px;color:var(--gray-600);margin-top:4px;}
+
+.filters-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+.filters-bar .input,.filters-bar .select{width:auto;min-width:150px;}
+.filters-bar .search-input{min-width:220px;}
+
+.detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start;}
+@media (max-width:900px){.detail-grid{grid-template-columns:1fr;}}
+.kv-row{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--gray-100);font-size:13px;}
+.kv-row:last-child{border-bottom:none;}
+.kv-row .k{color:var(--gray-600);flex:none;width:180px;}
+.kv-row .v{font-weight:600;text-align:right;flex:1;}
+.subhead{font-size:13px;font-weight:700;color:var(--gray-700);margin:18px 0 8px;text-transform:none;}
+.subhead:first-child{margin-top:0;}
+.comment-box{background:var(--gray-100);border-radius:10px;padding:13px 15px;font-size:13px;margin-bottom:8px;}
+.comment-box .cb-head{display:flex;justify-content:space-between;font-size:11.5px;color:var(--gray-600);margin-bottom:6px;font-weight:700;}
+.history-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100);font-size:12.5px;}
+.history-item:last-child{border-bottom:none;}
+.history-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-400);margin-top:6px;flex:none;}
+.history-time{color:var(--gray-500);width:118px;flex:none;}
+.review-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.step-actions{display:flex;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-100);}
+.autosave-note{font-size:11.5px;color:var(--gray-500);display:flex;align-items:center;gap:6px;}
+.tooltip-wrap{position:relative;display:inline-block;cursor:help;}
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+<div id="modal-root"></div>
+
+<header id="app-header"></header>
+<main id="app-root"></main>
+
+<script>
+'use strict';
+/* ============================================================================
+   СЛОЙ ДАННЫХ (DATA LAYER)
+   Все обращения к хранилищу проходят через объект DataAPI. Сейчас данные
+   лежат в localStorage браузера. При переходе на серверную часть достаточно
+   заменить реализацию методов DataAPI на вызовы реального API — остальной
+   код (интерфейс, логика экранов) менять не потребуется.
+   ============================================================================ */
+const LS_KEYS = {
+  REQUESTS:'automationApp.requests.v1',
+  DRAFT:'automationApp.draft.v1',
+  COUNTER:'automationApp.counter.v1',
+  SEEDED:'automationApp.seeded.v1'
+};
+
+function readJSON(key, fallback){
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+  catch(e){ console.error('Ошибка чтения localStorage', key, e); return fallback; }
+}
+function writeJSON(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }
+  catch(e){ console.error('Ошибка записи localStorage', key, e); }
+}
+function uid(prefix){ return prefix+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function nowISO(){ return new Date().toISOString(); }
+
+const DataAPI = {
+  listRequests(){ return readJSON(LS_KEYS.REQUESTS, []); },
+  saveAllRequests(list){ writeJSON(LS_KEYS.REQUESTS, list); },
+  getRequest(id){ return this.listRequests().find(r=>r.id===id) || null; },
+  createRequest(req){ const list=this.listRequests(); list.push(req); this.saveAllRequests(list); return req; },
+  updateRequest(id, patchFn){
+    const list=this.listRequests();
+    const idx=list.findIndex(r=>r.id===id);
+    if(idx===-1) return null;
+    patchFn(list[idx]);
+    list[idx].updatedAt = nowISO();
+    this.saveAllRequests(list);
+    return list[idx];
+  },
+  getDraft(){ return readJSON(LS_KEYS.DRAFT, null); },
+  saveDraft(d){ writeJSON(LS_KEYS.DRAFT, d); },
+  clearDraft(){ localStorage.removeItem(LS_KEYS.DRAFT); },
+  nextNumber(){
+    const year = new Date().getFullYear();
+    const counters = readJSON(LS_KEYS.COUNTER, {});
+    const next = (counters[year]||0) + 1;
+    counters[year] = next;
+    writeJSON(LS_KEYS.COUNTER, counters);
+    return 'AUT-'+year+'-'+String(next).padStart(6,'0');
+  }
+};
+
+/* ============================================================================
+   МОДУЛЬ УВЕДОМЛЕНИЙ (ДЕМОНСТРАЦИОННЫЙ)
+   В прототипе без серверной части реальная отправка почты невозможна.
+   Функции ниже формируют демонстрационную запись о том, что уведомление
+   было бы отправлено, и показывают всплывающее сообщение. В промышленной
+   версии тело этих функций заменяется на вызов корпоративного почтового
+   API/шлюза интеграции — сигнатуры вызова в остальном коде не меняются.
+   ============================================================================ */
+const NotifyService = {
+  _log(subjectText, recipientsHint){
+    showToast('Уведомление сформировано: «'+subjectText+'». Получатели: '+recipientsHint, 'info');
+  },
+  requestRegistered(req){
+    this._log('заявка '+req.number+' зарегистрирована', 'заявитель, доп. получатели, служебные адреса администраторов');
+  },
+  clarificationRequested(req){
+    this._log('по заявке '+req.number+' запрошено уточнение', 'заявитель');
+  },
+  statusChanged(req, oldStatus, newStatus){
+    this._log('статус заявки '+req.number+' изменён на «'+STATUSES[newStatus].label+'»', 'заявитель, доп. получатели');
+  },
+  resubmitted(req){
+    this._log('заявка '+req.number+' повторно направлена на рассмотрение', 'администраторы (служебные адреса)');
+  }
+};
+
+/* ============================================================================
+   СПРАВОЧНИКИ
+   ============================================================================ */
+const REGIONS = ['Головной офис','Филиал Тюмень','Филиал Красноярск','Филиал Уфа'];
+const TOPICS = ['Производство','Планирование','Экономика','Кадры','Делопроизводство','Транспорт','АХО','Закупки','ПБОТОС','Оборудование','Другое'];
+const FREQUENCIES = ['ежедневно','несколько раз в неделю','еженедельно','ежемесячно','ежеквартально','по необходимости','другое'];
+const DURATION_UNITS = {minutes:'минут', hours:'часов', days:'рабочих дней'};
+
+const STATUSES = {
+  draft:{label:'Черновик', cls:'st-gray'},
+  submitted:{label:'Отправлена', cls:'st-blue'},
+  review:{label:'На рассмотрении', cls:'st-yellow'},
+  clarification:{label:'Требуется уточнение', cls:'st-orange'},
+  accepted:{label:'Принята в работу', cls:'st-blue'},
+  development:{label:'В разработке', cls:'st-blue'},
+  testing:{label:'Тестирование', cls:'st-blue'},
+  done:{label:'Готово', cls:'st-green'},
+  rejected:{label:'Отклонена', cls:'st-red'},
+  closed:{label:'Закрыта', cls:'st-gray'}
+};
+const LIFECYCLE_ORDER = ['submitted','review','accepted','development','testing','done','closed'];
+const FORWARD_TRANSITIONS = { accepted:'development', development:'testing', testing:'done', done:'closed' };
+
+const WIZARD_STEPS = ['Заявитель','Тип заявки','Тематика','Описание','Проверка','Отправлено'];
+
+/* ============================================================================
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+   ============================================================================ */
+function getDeep(obj, path){ return path.split('.').reduce((o,k)=> (o==null?undefined:o[k]), obj); }
+function setDeep(obj, path, value){
+  const keys = path.split('.'); let o = obj;
+  for(let i=0;i<keys.length-1;i++){ if(o[keys[i]]==null) o[keys[i]]={}; o = o[keys[i]]; }
+  o[keys[keys.length-1]] = value;
+}
+function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
+function isValidPhone(v){
+  const cleaned = (v||'').replace(/[^\d+]/g,'');
+  return /^[\d\s()+-]{10,20}$/.test((v||'').trim()) && cleaned.replace(/\D/g,'').length>=10;
+}
+function addBusinessDays(date, days){
+  let d = new Date(date); let added = 0;
+  while(added < days){
+    d.setDate(d.getDate()+1);
+    const day = d.getDay();
+    if(day!==0 && day!==6) added++;
+  }
+  return d;
+}
+function fmtDate(d){
+  if(!d) return '—';
+  const date = (d instanceof Date) ? d : new Date(d);
+  if(isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function fmtDateTime(d){
+  const date = (d instanceof Date) ? d : new Date(d);
+  if(isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString('ru-RU') + ', ' + date.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+}
+function fileExt(name){ const parts=name.split('.'); return parts.length>1 ? parts.pop().toUpperCase() : 'ФАЙЛ'; }
+function fileSizeLabel(bytes){
+  if(bytes < 1024) return bytes+' Б';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+' КБ';
+  return (bytes/1024/1024).toFixed(2)+' МБ';
+}
+function escapeHtml(s){
+  return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function calcWorkload(w){
+  const dur = parseFloat(w.duration), times = parseFloat(w.timesPerPeriod), emp = parseFloat(w.employeesCount);
+  if(!dur || !times || !emp) return null;
+  const unitToHours = { minutes: 1/60, hours: 1, days: 8 };
+  const hoursPerOp = dur * (unitToHours[w.durationUnit] || 1);
+  const total = hoursPerOp * times * emp;
+  return Math.round(total*10)/10;
+}
+
+/* ============================================================================
+   СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+   ============================================================================ */
+const State = {
+  role:'applicant',
+  screen:'home',
+  wizardStep:1,
+  wizard:null,
+  wizardErrors:{},
+  editingRequestId:null,
+  selectedId:null,
+  lastCreatedNumber:null,
+  myFilter:{q:'', status:'', topic:''},
+  regFilter:{q:'', status:'', topic:'', region:'', sortBy:'createdAt', sortDir:'desc'},
+  dragCounter:0
+};
+
+function newWizardData(){
+  return {
+    applicant:{ fio:'', phone:'', email:'', extraEmails:[], region:REGIONS[0], department:'', consent:false },
+    type:'', existingSystemName:'',
+    topic:'', topicOther:'',
+    process:'', problem:'', desiredResult:'', methodSuggestion:'',
+    documents:[],
+    beneficiaries:'',
+    workload:{ frequency:'', frequencyOther:'', duration:'', durationUnit:'hours', timesPerPeriod:'', employeesCount:'', extra:'' },
+    resultRecipient:''
+  };
+}
+
+/* ============================================================================
+   ДЕМОНСТРАЦИОННЫЕ ДАННЫЕ
+   ============================================================================ */
+function daysAgoISO(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+
+function seedDemoData(){
+  if(localStorage.getItem(LS_KEYS.SEEDED)) return;
+
+  function baseApplicant(fio,email,region,dept,phone){
+    return { fio, phone, email, extraEmails:[], region, department:dept, consent:true };
+  }
+  function mkHistory(entries){ return entries; }
+
+  const demo = [];
+
+  // 1. Новая заявка, только что отправлена
+  demo.push({
+    id:uid('req'), number:DataAPI.nextNumber(), status:'review',
+    createdAt:daysAgoISO(0), updatedAt:daysAgoISO(0),
+    applicant:baseApplicant('Смирнова Ольга Викторовна','o.smirnova@company.ru','Головной офис','Отдел экономики и планирования','+7 912 345-67-89'),
+    type:'new', existingSystemName:'',
+    topic:'Экономика', topicOther:'',
+    process:'Ежемесячно экономист вручную собирает данные о фактических затратах из пяти отчетов в Excel, присылаемых разными подразделениями, и сводит их в единую таблицу.',
+    problem:'Сведение данных занимает много времени, часто встречаются ошибки при копировании, разные подразделения используют разные форматы файлов.',
+    desiredResult:'Система должна автоматически получать отчеты от подразделений и формировать единую сводную таблицу затрат.',
+    methodSuggestion:'', documents:[], beneficiaries:'Отдел экономики и планирования, финансовый департамент.',
+    workload:{ frequency:'ежемесячно', frequencyOther:'', duration:'3', durationUnit:'hours', timesPerPeriod:'1', employeesCount:'1', extra:'' },
+    resultRecipient:'Начальник отдела экономики и планирования',
+    responsible:'', deadline:null,
+    reviewDueDate: addBusinessDays(new Date(daysAgoISO(0)),5).toISOString(),
+    history: mkHistory([
+      {status:'submitted', comment:'', actor:'Заявитель', ts:daysAgoISO(0)},
+      {status:'review', comment:'', actor:'Система', ts:daysAgoISO(0)}
+    ])
+  });
+
+  // 2. Заявка на рассмотрении, срок приближается/просрочен
+  demo.push({
+    id:uid('req'), number:DataAPI.nextNumber(), status:'review',
+    createdAt:daysAgoISO(9), updatedAt:daysAgoISO(9),
+    applicant:baseApplicant('Ковалёв Дмитрий Сергеевич','d.kovalev@company.ru','Филиал Тюмень','Транспортный участок','+7 922 111-22-33'),
+    type:'new', existingSystemName:'',
+    topic:'Транспорт', topicOther:'',
+    process:'Диспетчер вручную распределяет заявки на транспорт между водителями по телефону и в блокноте.',
+    problem:'Нет единого журнала заявок, сложно отследить загрузку транспорта, часто происходят накладки.',
+    desiredResult:'Хотелось бы, чтобы заявки на транспорт подавались через единую форму, а система сама показывала свободные машины.',
+    methodSuggestion:'', documents:[], beneficiaries:'Водители, диспетчерская служба, подразделения-заказчики транспорта.',
+    workload:{ frequency:'ежедневно', frequencyOther:'', duration:'40', durationUnit:'minutes', timesPerPeriod:'1', employeesCount:'2', extra:'' },
+    resultRecipient:'Начальник транспортного участка',
+    responsible:'', deadline:null,
+    reviewDueDate: addBusinessDays(new Date(daysAgoISO(9)),5).toISOString(),
+    history: mkHistory([
+      {status:'submitted', comment:'', actor:'Заявитель', ts:daysAgoISO(9)},
+      {status:'review', comment:'', actor:'Система', ts:daysAgoISO(9)}
+    ])
+  });
+
+  // 3. Требуется уточнение
+  demo.push({
+    id:uid('req'), number:DataAPI.nextNumber(), status:'clarification',
+    createdAt:daysAgoISO(6), updatedAt:daysAgoISO(2),
+    applicant:baseApplicant('Ахметова Гульнара Рашитовна','g.ahmetova@company.ru','Филиал Уфа','Отдел кадров','+7 987 654-32-10'),
+    type:'upgrade', existingSystemName:'Модуль кадрового учета «HR-Portal»',
+    topic:'Кадры', topicOther:'',
+    process:'Заявки на отпуск сотрудники подают на бумаге, кадровик вручную вносит данные в систему учета.',
+    problem:'Много времени уходит на перенос бумажных заявлений в систему, теряются отдельные документы.',
+    desiredResult:'Сотрудник подает заявление на отпуск через форму, кадровик только подтверждает его в системе.',
+    methodSuggestion:'Возможно, доработать существующий модуль «HR-Portal» добавлением формы заявления.',
+    documents:[{id:uid('doc'), name:'forma_zayavleniya_otpusk.docx', ext:'DOCX', sizeLabel:'48 КБ', usage:'Используется структура полей заявления: ФИО, период отпуска, основание.', futureUse:'После автоматизации форма должна повторять эти поля в электронном виде.'}],
+    beneficiaries:'Сотрудники филиала, отдел кадров.',
+    workload:{ frequency:'несколько раз в неделю', frequencyOther:'', duration:'25', durationUnit:'minutes', timesPerPeriod:'4', employeesCount:'1', extra:'' },
+    resultRecipient:'Начальник отдела кадров',
+    responsible:'', deadline:null,
+    reviewDueDate: addBusinessDays(new Date(daysAgoISO(6)),5).toISOString(),
+    history: mkHistory([
+      {status:'submitted', comment:'', actor:'Заявитель', ts:daysAgoISO(6)},
+      {status:'review', comment:'', actor:'Система', ts:daysAgoISO(6)},
+      {status:'clarification', comment:'Просьба приложить пример текущего бумажного заявления и уточнить, какие согласующие должны видеть заявку.', actor:'Администратор', ts:daysAgoISO(2)}
+    ])
+  });
+
+  // 4. В разработке
+  demo.push({
+    id:uid('req'), number:DataAPI.nextNumber(), status:'development',
+    createdAt:daysAgoISO(22), updatedAt:daysAgoISO(4),
+    applicant:baseApplicant('Титов Игорь Павлович','i.titov@company.ru','Головной офис','Отдел закупок','+7 903 222-44-55'),
+    type:'new', existingSystemName:'',
+    topic:'Закупки', topicOther:'',
+    process:'Заявки на закупку материалов собираются по почте от разных подразделений в свободной форме.',
+    problem:'Сложно отследить статус заявки, часто теряются вложения, нет единого реестра закупок.',
+    desiredResult:'Единая форма заявки на закупку с автоматическим реестром и статусами обработки.',
+    methodSuggestion:'', documents:[], beneficiaries:'Все подразделения, инициирующие закупки, отдел закупок.',
+    workload:{ frequency:'еженедельно', frequencyOther:'', duration:'5', durationUnit:'hours', timesPerPeriod:'1', employeesCount:'2', extra:'' },
+    resultRecipient:'Начальник отдела закупок',
+    responsible:'Группа развития информационных систем', deadline: (function(){const d=new Date(); d.setDate(d.getDate()+18); return d.toISOString();})(),
+    reviewDueDate: addBusinessDays(new Date(daysAgoISO(22)),5).toISOString(),
+    history: mkHistory([
+      {status:'submitted', comment:'', actor:'Заявитель', ts:daysAgoISO(22)},
+      {status:'review', comment:'', actor:'Система', ts:daysAgoISO(22)},
+      {status:'accepted', comment:'Заявка принята в работу, ориентировочный срок реализации указан.', actor:'Администратор', ts:daysAgoISO(17)},
+      {status:'development', comment:'Начата разработка формы заявки на закупку.', actor:'Администратор', ts:daysAgoISO(4)}
+    ])
+  });
+
+  // 5. Готово
+  demo.push({
+    id:uid('req'), number:DataAPI.nextNumber(), status:'done',
+    createdAt:daysAgoISO(40), updatedAt:daysAgoISO(1),
+    applicant:baseApplicant('フФедорова Марина Игоревна'.replace('フ',''),'m.fedorova@company.ru','Головной офис','Отдел ПБОТОС','+7 916 777-88-99'),
+    type:'new', existingSystemName:'',
+    topic:'ПБОТОС', topicOther:'',
+    process:'Журнал инструктажей по охране труда ведется в бумажном виде на каждом участке отдельно.',
+    problem:'Сложно контролировать сроки повторных инструктажей, данные не сводятся в единую картину.',
+    desiredResult:'Система должна напоминать о сроках инструктажей и хранить единый электронный журнал.',
+    methodSuggestion:'', documents:[], beneficiaries:'Специалисты по охране труда, руководители участков.',
+    workload:{ frequency:'еженедельно', frequencyOther:'', duration:'2', durationUnit:'hours', timesPerPeriod:'1', employeesCount:'3', extra:'' },
+    resultRecipient:'Главный специалист по охране труда',
+    responsible:'Группа развития информационных систем', deadline: daysAgoISO(-2 * -1),
+    reviewDueDate: addBusinessDays(new Date(daysAgoISO(40)),5).toISOString(),
+    history: mkHistory([
+      {status:'submitted', comment:'', actor:'Заявитель', ts:daysAgoISO(40)},
+      {status:'review', comment:'', actor:'Система', ts:daysAgoISO(40)},
+      {status:'accepted', comment:'Принято в работу.', actor:'Администратор', ts:daysAgoISO(35)},
+      {status:'development', comment:'', actor:'Администратор', ts:daysAgoISO(25)},
+      {status:'testing', comment:'Передано на тестирование специалистам по охране труда.', actor:'Администратор', ts:daysAgoISO(8)},
+      {status:'done', comment:'Тестирование завершено успешно, решение готово к использованию.', actor:'Администратор', ts:daysAgoISO(1)}
+    ])
+  });
+
+  // 6. Отклонена
+  demo.push({
+    id:uid('req'), number:DataAPI.nextNumber(), status:'rejected',
+    createdAt:daysAgoISO(15), updatedAt:daysAgoISO(12),
+    applicant:baseApplicant('Никитин Артём Олегович','a.nikitin@company.ru','Филиал Красноярск','АХО','+7 923 555-66-77'),
+    type:'new', existingSystemName:'',
+    topic:'АХО', topicOther:'',
+    process:'Заявки на канцелярские товары подаются устно кладовщику.',
+    problem:'Иногда забывают, что заказывали, нет истории расхода материалов.',
+    desiredResult:'Хотелось бы электронную форму заказа канцелярии.',
+    methodSuggestion:'', documents:[], beneficiaries:'Сотрудники филиала.',
+    workload:{ frequency:'по необходимости', frequencyOther:'', duration:'15', durationUnit:'minutes', timesPerPeriod:'2', employeesCount:'1', extra:'' },
+    resultRecipient:'Заведующий хозяйством',
+    responsible:'', deadline:null,
+    reviewDueDate: addBusinessDays(new Date(daysAgoISO(15)),5).toISOString(),
+    history: mkHistory([
+      {status:'submitted', comment:'', actor:'Заявитель', ts:daysAgoISO(15)},
+      {status:'review', comment:'', actor:'Система', ts:daysAgoISO(15)},
+      {status:'rejected', comment:'Трудоемкость процесса невелика, автоматизация в данный момент нецелесообразна. Рекомендуем вести учет в общей таблице подразделения.', actor:'Администратор', ts:daysAgoISO(12)}
+    ])
+  });
+
+  DataAPI.saveAllRequests(demo);
+  localStorage.setItem(LS_KEYS.SEEDED, '1');
+}
+
+function resetDemoData(){
+  localStorage.removeItem(LS_KEYS.REQUESTS);
+  localStorage.removeItem(LS_KEYS.DRAFT);
+  localStorage.removeItem(LS_KEYS.COUNTER);
+  localStorage.removeItem(LS_KEYS.SEEDED);
+  seedDemoData();
+  State.screen = State.role==='admin' ? 'adminDashboard' : 'home';
+  State.selectedId = null;
+  render();
+  showToast('Демонстрационные данные сброшены и созданы заново.', 'info');
+}
+
+/* ============================================================================
+   TOAST / MODAL
+   ============================================================================ */
+function showToast(msg, type){
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast'+(type==='warn'?' warn':'');
+  el.innerHTML = '<div class="dot"></div><div>'+escapeHtml(msg)+'</div>';
+  c.appendChild(el);
+  setTimeout(()=>{ el.classList.add('fade-out'); setTimeout(()=>el.remove(),260); }, 4200);
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+function openModal(html){
+  document.getElementById('modal-root').innerHTML =
+    '<div class="modal-overlay" data-action="modal-overlay"><div class="modal" onclick="event.stopPropagation()">'+html+'</div></div>';
+}
+
+/* ============================================================================
+   РЕНДЕР: ШАПКА
+   ============================================================================ */
+function renderHeader(){
+  const applicantNav = [
+    ['home','Главная'],['wizard','Создать заявку'],['myRequests','Мои заявки']
+  ];
+  const adminNav = [
+    ['adminDashboard','Дашборд'],['adminRegistry','Реестр заявок']
+  ];
+  const nav = State.role==='admin' ? adminNav : applicantNav;
+  const navHtml = nav.map(([scr,label])=>{
+    const active = (State.screen===scr) || (scr==='wizard' && State.screen==='wizard');
+    return '<button class="nav-btn'+(active?' active':'')+'" data-action="nav" data-screen="'+scr+'">'+label+'</button>';
+  }).join('');
+
+  document.getElementById('app-header').innerHTML = `
+    <div class="header-left" data-action="nav" data-screen="${State.role==='admin'?'adminDashboard':'home'}">
+      <div class="header-logo">СЗ</div>
+      <div class="header-titles">
+        <h1>Система заявок на автоматизацию</h1>
+        <p>Подача и сопровождение инициатив по автоматизации бизнес-процессов</p>
+      </div>
+    </div>
+    <nav class="header-nav">${navHtml}</nav>
+    <div class="header-right">
+      <div class="role-switch">
+        <button class="${State.role==='applicant'?'active':''}" data-action="set-role" data-role="applicant">Заявитель</button>
+        <button class="${State.role==='admin'?'active':''}" data-action="set-role" data-role="admin">Администратор</button>
+      </div>
+      <button class="reset-link" data-action="reset-data" title="Сбросить демонстрационные данные">⟲ Демо-данные</button>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   РЕНДЕР: ГЛАВНЫЙ ЭКРАН
+   ============================================================================ */
+function renderHome(){
+  const draft = DataAPI.getDraft();
+  let draftBanner = '';
+  if(draft){
+    draftBanner = `
+      <div class="draft-banner">
+        <div><strong>У вас есть незавершённый черновик заявки.</strong><br><span>Продолжить заполнение черновика?</span></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-secondary btn-sm" data-action="discard-draft">Начать заново</button>
+          <button class="btn btn-primary btn-sm" data-action="continue-draft">Продолжить заполнение</button>
+        </div>
+      </div>`;
+  }
+
+  const all = DataAPI.listRequests();
+  const mine = all.length;
+  const inProgress = all.filter(r=>['review','clarification','accepted','development','testing'].includes(r.status)).length;
+
+  return `
+    ${draftBanner}
+    <div class="hero">
+      <h2>Подайте заявку на автоматизацию за несколько минут</h2>
+      <p>Опишите текущий процесс простыми словами — мы поможем сформулировать заявку, отследить её рассмотрение и узнать о ходе реализации.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" data-action="new-request">+ Создать заявку</button>
+        <button class="btn btn-secondary" data-action="nav" data-screen="myRequests" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff;">Мои заявки${mine?' ('+mine+')':''}</button>
+      </div>
+    </div>
+    <div class="info-strip">
+      <div class="ii">💡</div>
+      <div>Здесь Вы можете подать заявку на автоматизацию процесса, отслеживать её рассмотрение и получать информацию о ходе реализации. Весь путь заявки — от подачи до завершения — отображается в виде понятного таймлайна.</div>
+    </div>
+    ${mine ? `
+    <div class="card" style="margin-top:16px;">
+      <div class="section-title">Коротко о ваших заявках</div>
+      <div class="section-sub">${inProgress} в работе, ${mine} всего</div>
+      <button class="btn btn-secondary btn-sm" data-action="nav" data-screen="myRequests">Перейти к списку заявок →</button>
+    </div>` : ''}
+  `;
+}
+
+/* ============================================================================
+   РЕНДЕР: ПОШАГОВЫЙ ТАЙМЛАЙН (STEPPER) ФОРМЫ ПОДАЧИ
+   ============================================================================ */
+function renderStepper(){
+  const step = State.wizardStep;
+  const items = WIZARD_STEPS.map((label,i)=>{
+    const n = i+1;
+    let cls = 'step-item';
+    if(n < step) cls += ' completed';
+    else if(n === step) cls += ' current';
+    return `<div class="${cls}">
+      <div class="step-line"></div>
+      <div class="step-circle">${n<step?'✓':n}</div>
+      <div class="step-label">${label}</div>
+    </div>`;
+  }).join('');
+  const percent = Math.round(((step-1)/(WIZARD_STEPS.length-1))*100);
+  return `
+    <div class="stepper-wrap">
+      <div class="stepper">${items}</div>
+      <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${percent}%"></div></div>
+      <div class="progress-label">Заполнено ${percent}%</div>
+    </div>
+  `;
+}
+
+/* ---- поля-хелперы ---- */
+function fieldText(opts){
+  const {label, path, value, required, hint, error, placeholder, type} = opts;
+  return `
+    <div class="field-block">
+      <label class="field-label">${label}${required?'<span class="required-mark">*</span>':''}</label>
+      <input class="input${error?' invalid':''}" type="${type||'text'}" data-field="${path}" value="${escapeHtml(value||'')}" placeholder="${escapeHtml(placeholder||'')}">
+      ${hint?`<div class="hint">${hint}</div>`:''}
+      ${error?`<div class="field-error">⚠ ${error}</div>`:''}
+    </div>`;
+}
+function fieldTextarea(opts){
+  const {label, path, value, required, hint, error, placeholder, rows} = opts;
+  return `
+    <div class="field-block">
+      <label class="field-label">${label}${required?'<span class="required-mark">*</span>':''}</label>
+      <textarea class="textarea${error?' invalid':''}" data-field="${path}" placeholder="${escapeHtml(placeholder||'')}" rows="${rows||4}">${escapeHtml(value||'')}</textarea>
+      ${hint?`<div class="hint">${hint}</div>`:''}
+      ${error?`<div class="field-error">⚠ ${error}</div>`:''}
+    </div>`;
+}
+function fieldSelect(opts){
+  const {label, path, value, required, options, hint, error, placeholder} = opts;
+  const optHtml = (placeholder? `<option value="">${escapeHtml(placeholder)}</option>` : '') +
+    options.map(o=>{
+      const val = Array.isArray(o)?o[0]:o, lbl = Array.isArray(o)?o[1]:o;
+      return `<option value="${escapeHtml(val)}"${value===val?' selected':''}>${escapeHtml(lbl)}</option>`;
+    }).join('');
+  return `
+    <div class="field-block">
+      <label class="field-label">${label}${required?'<span class="required-mark">*</span>':''}</label>
+      <select class="select${error?' invalid':''}" data-field="${path}">${optHtml}</select>
+      ${hint?`<div class="hint">${hint}</div>`:''}
+      ${error?`<div class="field-error">⚠ ${error}</div>`:''}
+    </div>`;
+}
+
+/* ============================================================================
+   ШАГ 1 — ДАННЫЕ ЗАЯВИТЕЛЯ
+   ============================================================================ */
+function renderStep1(){
+  const w = State.wizard, err = State.wizardErrors;
+  const extraEmailsHtml = w.applicant.extraEmails.map((em,i)=>{
+    const emErr = err['applicant.extraEmails.'+i];
+    return `
+    <div style="margin-bottom:8px;">
+      <div class="field-row" style="align-items:center;">
+        <input class="input${emErr?' invalid':''}" type="email" data-field="applicant.extraEmails.${i}" value="${escapeHtml(em)}" placeholder="дополнительный@company.ru">
+        <button class="btn btn-ghost btn-sm" style="flex:none;" data-action="remove-extra-email" data-index="${i}">✕ Удалить</button>
+      </div>
+      ${emErr?`<div class="field-error">⚠ ${emErr}</div>`:''}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="card">
+      <div class="section-title">Данные заявителя</div>
+      <div class="section-sub">Эта информация нужна, чтобы связаться с вами по заявке и направить уведомления о ходе рассмотрения.</div>
+
+      ${fieldText({label:'ФИО', path:'applicant.fio', value:w.applicant.fio, required:true, error:err['applicant.fio'], placeholder:'Иванов Иван Иванович'})}
+
+      <div class="two-col">
+        ${fieldText({label:'Телефон для связи', path:'applicant.phone', value:w.applicant.phone, required:true, error:err['applicant.phone'], placeholder:'+7 900 000-00-00'})}
+        ${fieldText({label:'Электронная почта', path:'applicant.email', value:w.applicant.email, required:true, error:err['applicant.email'], placeholder:'name@company.ru', type:'email'})}
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Дополнительные получатели уведомлений</label>
+        ${extraEmailsHtml}
+        <button class="btn btn-secondary btn-sm" data-action="add-extra-email">+ Добавить email</button>
+        <div class="hint">Эти адреса будут получать уведомления о статусе заявки вместе с вами.</div>
+      </div>
+
+      <div class="two-col">
+        ${fieldSelect({label:'Регион', path:'applicant.region', value:w.applicant.region, required:true, options:REGIONS})}
+        ${fieldText({label:'Структурное подразделение', path:'applicant.department', value:w.applicant.department, required:true, error:err['applicant.department'], placeholder:'Например: Отдел экономики и планирования'})}
+      </div>
+
+      <div class="field-block" style="margin-top:8px;">
+        <label class="checkbox-row">
+          <input type="checkbox" data-field="applicant.consent" ${w.applicant.consent?'checked':''}>
+          <span>Даю согласие на обработку указанных персональных данных в целях рассмотрения заявки</span>
+        </label>
+        ${err['applicant.consent']?`<div class="field-error">⚠ ${err['applicant.consent']}</div>`:''}
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   ШАГ 2 — ТИП ЗАЯВКИ
+   ============================================================================ */
+function renderStep2(){
+  const w = State.wizard, err = State.wizardErrors;
+  return `
+    <div class="card">
+      <div class="section-title">Тип заявки</div>
+      <div class="section-sub">Выберите, о чём заявка: о новой автоматизации или о доработке уже существующей.</div>
+      <div class="choice-cards">
+        <div class="choice-card${w.type==='new'?' selected':''}" data-action="pick-type" data-value="new">
+          <div class="cc-title">🆕 Новая автоматизация</div>
+          <div class="cc-sub">Процесс сейчас выполняется вручную или без единой системы.</div>
+        </div>
+        <div class="choice-card${w.type==='upgrade'?' selected':''}" data-action="pick-type" data-value="upgrade">
+          <div class="cc-title">🔧 Доработка существующей автоматизации</div>
+          <div class="cc-sub">Уже есть система, но её нужно улучшить или расширить.</div>
+        </div>
+      </div>
+      ${err['type']?`<div class="field-error">⚠ ${err['type']}</div>`:''}
+      ${w.type==='upgrade' ? `
+        <div style="margin-top:18px;">
+          ${fieldText({label:'Укажите название существующей системы / автоматизации', path:'existingSystemName', value:w.existingSystemName, required:true, error:err['existingSystemName'], placeholder:'Например: модуль «HR-Portal»'})}
+        </div>` : ''}
+    </div>
+  `;
+}
+
+/* ============================================================================
+   ШАГ 3 — ТЕМАТИКА
+   ============================================================================ */
+function renderStep3(){
+  const w = State.wizard, err = State.wizardErrors;
+  const chips = TOPICS.map(t=>`<div class="topic-chip${w.topic===t?' selected':''}" data-action="pick-topic" data-value="${escapeHtml(t)}">${escapeHtml(t)}</div>`).join('');
+  return `
+    <div class="card">
+      <div class="section-title">Тематика заявки</div>
+      <div class="section-sub">Выберите область, к которой относится процесс.</div>
+      <div class="topic-grid">${chips}</div>
+      ${err['topic']?`<div class="field-error">⚠ ${err['topic']}</div>`:''}
+      ${w.topic==='Другое' ? `
+        <div style="margin-top:18px;">
+          ${fieldText({label:'Укажите тематику', path:'topicOther', value:w.topicOther, required:true, error:err['topicOther']})}
+        </div>` : ''}
+    </div>
+  `;
+}
+
+/* ============================================================================
+   ШАГ 4 — ОПИСАНИЕ ЗАЯВКИ (несколько карточек)
+   ============================================================================ */
+function renderDocumentItem(doc, idx){
+  return `
+    <div class="file-item">
+      <div class="file-item-head">
+        <div class="file-icon">${doc.ext}</div>
+        <div class="file-meta">
+          <div class="file-name" title="${escapeHtml(doc.name)}">${escapeHtml(doc.name)}</div>
+          <div class="file-size">${doc.sizeLabel}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="flex:none;" data-action="remove-doc" data-docid="${doc.id}">✕</button>
+      </div>
+      ${fieldTextarea({label:'Что именно используется из данного документа?', path:'documents:'+doc.id+':usage', value:doc.usage, rows:2, placeholder:'Например: из Excel используются столбцы №1, 3 и 7'})}
+      ${fieldTextarea({label:'Как данный документ должен использоваться после автоматизации?', path:'documents:'+doc.id+':futureUse', value:doc.futureUse, rows:2, placeholder:'Например: данные должны подставляться автоматически'})}
+    </div>`;
+}
+
+function renderStep4(){
+  const w = State.wizard, err = State.wizardErrors;
+  const workloadResult = calcWorkload(w.workload);
+
+  return `
+    <div class="card">
+      <div class="section-title">Текущий процесс</div>
+      <div class="section-sub">Опишите, как процесс выполняется сейчас.</div>
+      ${fieldTextarea({
+        label:'Опишите текущий процесс', path:'process', value:w.process, required:true, error:err['process'],
+        hint:'<b>Пример:</b> расскажите, как процесс выполняется сейчас: с чего начинается, какие действия выполняются, кто участвует и какой результат получается.'
+      })}
+    </div>
+
+    <div class="card">
+      <div class="section-title">Что требует автоматизации</div>
+      ${fieldTextarea({
+        label:'Что именно в процессе требует автоматизации и почему?', path:'problem', value:w.problem, required:true, error:err['problem'],
+        hint:'<b>Пример:</b> укажите ручные, повторяющиеся или трудоёмкие операции, ошибки, перенос информации между системами, работу с таблицами и другие сложности.'
+      })}
+    </div>
+
+    <div class="card">
+      <div class="section-title">Желаемый результат</div>
+      ${fieldTextarea({
+        label:'Как Вы хотели бы, чтобы процесс работал после автоматизации?', path:'desiredResult', value:w.desiredResult, required:true, error:err['desiredResult'],
+        hint:'<b>Пример:</b> «система автоматически получает данные, формирует отчёт и отправляет его получателю».'
+      })}
+      ${fieldTextarea({label:'Если у Вас есть предложения по способу автоматизации, опишите их (необязательно)', path:'methodSuggestion', value:w.methodSuggestion, rows:3})}
+    </div>
+
+    <div class="card">
+      <div class="section-title">Формы документов, используемые в процессе</div>
+      <div class="section-sub">Прикрепите файлы форм и укажите, как они используются. В прототипе сохраняются только сведения о файле (название, размер), не его содержимое.</div>
+      <div class="dropzone" id="dropzone" data-action="dropzone">
+        Перетащите файлы сюда или <label class="link-btn">выберите файл<input type="file" multiple style="display:none" data-action="file-input"></label>
+      </div>
+      ${w.documents.map((d,i)=>renderDocumentItem(d,i)).join('')}
+    </div>
+
+    <div class="card">
+      <div class="section-title">Получатели выгоды</div>
+      ${fieldTextarea({
+        label:'Кто получит выгоду от автоматизации?', path:'beneficiaries', value:w.beneficiaries, required:true, error:err['beneficiaries'],
+        hint:'Укажите сотрудников, подразделения или группы пользователей, которым автоматизация сократит время работы, уменьшит количество ошибок или упростит процесс.', rows:3
+      })}
+    </div>
+
+    <div class="card">
+      <div class="section-title">Текущая трудоёмкость процесса</div>
+      <div class="section-sub">Эти данные помогут оценить эффект от автоматизации. Пример: «каждый день сотрудник вручную собирает данные из 5 Excel-файлов. Процесс занимает около 3 часов».</div>
+      <div class="two-col">
+        ${fieldSelect({label:'Как часто выполняется операция?', path:'workload.frequency', value:w.workload.frequency, options:FREQUENCIES, placeholder:'Выберите вариант'})}
+        ${w.workload.frequency==='другое' ? fieldText({label:'Уточните периодичность', path:'workload.frequencyOther', value:w.workload.frequencyOther}) : '<div></div>'}
+      </div>
+      <div class="field-row">
+        ${fieldText({label:'Сколько времени занимает одна операция?', path:'workload.duration', value:w.workload.duration, type:'number', placeholder:'Например: 3'})}
+        ${fieldSelect({label:'Единица измерения', path:'workload.durationUnit', value:w.workload.durationUnit, options:Object.entries(DURATION_UNITS)})}
+      </div>
+      <div class="two-col">
+        ${fieldText({label:'Сколько раз выполняется за выбранный период?', path:'workload.timesPerPeriod', value:w.workload.timesPerPeriod, type:'number', placeholder:'Например: 1'})}
+        ${fieldText({label:'Сколько сотрудников участвует?', path:'workload.employeesCount', value:w.workload.employeesCount, type:'number', placeholder:'Например: 1'})}
+      </div>
+      ${fieldTextarea({label:'Дополнительное описание трудоёмкости (необязательно)', path:'workload.extra', value:w.workload.extra, rows:2})}
+      ${workloadResult!==null ? `
+        <div class="info-strip" style="margin-top:6px;">
+          <div class="ii">📊</div>
+          <div>Ориентировочная текущая трудоёмкость: <b>${workloadResult} чел.-часов</b> за указанный период.<br><span style="color:var(--gray-500);font-size:11.5px;">Расчёт является приблизительным и основан на введённых данных.</span></div>
+        </div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="section-title">Получатель результата</div>
+      ${fieldTextarea({
+        label:'Кто получает результат данного процесса или сформированную информацию?', path:'resultRecipient', value:w.resultRecipient, required:true, error:err['resultRecipient'],
+        hint:'Можно указать ФИО, должность, подразделение, группу сотрудников или внешнего получателя.', rows:2
+      })}
+    </div>
+  `;
+}
+
+/* ============================================================================
+   ШАГ 5 — ПРОВЕРКА ЗАЯВКИ
+   ============================================================================ */
+function reviewSection(title, stepNum, contentHtml){
+  return `
+    <div class="card">
+      <div class="review-section-head">
+        <div class="section-title" style="margin-bottom:0;">${title}</div>
+        <button class="btn btn-ghost btn-sm" data-action="edit-step" data-step="${stepNum}">✎ Изменить</button>
+      </div>
+      ${contentHtml}
+    </div>`;
+}
+function renderStep5(){
+  const w = State.wizard, err = State.wizardErrors;
+  const workloadResult = calcWorkload(w.workload);
+
+  const s1 = `
+    <div class="kv-row"><div class="k">ФИО</div><div class="v">${escapeHtml(w.applicant.fio)||'—'}</div></div>
+    <div class="kv-row"><div class="k">Телефон</div><div class="v">${escapeHtml(w.applicant.phone)||'—'}</div></div>
+    <div class="kv-row"><div class="k">Email</div><div class="v">${escapeHtml(w.applicant.email)||'—'}</div></div>
+    ${w.applicant.extraEmails.filter(Boolean).length?`<div class="kv-row"><div class="k">Доп. email</div><div class="v">${w.applicant.extraEmails.filter(Boolean).map(escapeHtml).join(', ')}</div></div>`:''}
+    <div class="kv-row"><div class="k">Регион</div><div class="v">${escapeHtml(w.applicant.region)}</div></div>
+    <div class="kv-row"><div class="k">Подразделение</div><div class="v">${escapeHtml(w.applicant.department)||'—'}</div></div>
+  `;
+  const s2 = `
+    <div class="kv-row"><div class="k">Тип заявки</div><div class="v">${w.type==='upgrade'?'Доработка существующей автоматизации':'Новая автоматизация'}</div></div>
+    ${w.type==='upgrade'?`<div class="kv-row"><div class="k">Существующая система</div><div class="v">${escapeHtml(w.existingSystemName)||'—'}</div></div>`:''}
+  `;
+  const s3 = `<div class="kv-row"><div class="k">Тематика</div><div class="v">${escapeHtml(w.topic==='Другое'?w.topicOther:w.topic)||'—'}</div></div>`;
+  const s4 = `
+    <div class="subhead">Текущий процесс</div><p style="font-size:13px;">${escapeHtml(w.process)||'—'}</p>
+    <div class="subhead">Требует автоматизации</div><p style="font-size:13px;">${escapeHtml(w.problem)||'—'}</p>
+    <div class="subhead">Желаемый результат</div><p style="font-size:13px;">${escapeHtml(w.desiredResult)||'—'}</p>
+    ${w.methodSuggestion?`<div class="subhead">Предложение по способу автоматизации</div><p style="font-size:13px;">${escapeHtml(w.methodSuggestion)}</p>`:''}
+    <div class="subhead">Документы</div>
+    ${w.documents.length? w.documents.map(d=>`<div class="kv-row"><div class="k">${escapeHtml(d.name)} (${d.sizeLabel})</div><div class="v" style="text-align:left;">${escapeHtml(d.usage)||'—'}</div></div>`).join('') : '<p style="font-size:13px;color:var(--gray-500);">Документы не прикреплены</p>'}
+    <div class="subhead">Получатели выгоды</div><p style="font-size:13px;">${escapeHtml(w.beneficiaries)||'—'}</p>
+    <div class="subhead">Трудоёмкость</div>
+    <div class="kv-row"><div class="k">Периодичность</div><div class="v">${escapeHtml(w.workload.frequency==='другое'?w.workload.frequencyOther:w.workload.frequency)||'—'}</div></div>
+    <div class="kv-row"><div class="k">Время на операцию</div><div class="v">${w.workload.duration||'—'} ${DURATION_UNITS[w.workload.durationUnit]||''}</div></div>
+    <div class="kv-row"><div class="k">Раз за период</div><div class="v">${w.workload.timesPerPeriod||'—'}</div></div>
+    <div class="kv-row"><div class="k">Сотрудников</div><div class="v">${w.workload.employeesCount||'—'}</div></div>
+    ${workloadResult!==null?`<div class="kv-row"><div class="k">Ориентировочно</div><div class="v">${workloadResult} чел.-часов</div></div>`:''}
+    <div class="subhead">Получатель результата</div><p style="font-size:13px;">${escapeHtml(w.resultRecipient)||'—'}</p>
+  `;
+
+  return `
+    <div class="card" style="background:var(--gray-100);border:none;box-shadow:none;padding:18px 24px;">
+      <div class="section-title" style="margin-bottom:2px;">Проверьте заявку перед отправкой</div>
+      <div class="section-sub" style="margin-bottom:0;">Убедитесь, что данные заполнены верно. Любой раздел можно изменить.</div>
+    </div>
+    ${reviewSection('Данные заявителя', 1, s1)}
+    ${reviewSection('Тип заявки', 2, s2)}
+    ${reviewSection('Тематика', 3, s3)}
+    ${reviewSection('Описание заявки', 4, s4)}
+    <div class="card">
+      <label class="checkbox-row">
+        <input type="checkbox" id="confirm-check" data-field="__confirm" ${w.__confirm?'checked':''}>
+        <span>Подтверждаю, что указанные данные верны</span>
+      </label>
+      ${err['__confirm']?`<div class="field-error">⚠ ${err['__confirm']}</div>`:''}
+    </div>
+  `;
+}
+
+/* ============================================================================
+   ШАГ 6 — УСПЕШНАЯ РЕГИСТРАЦИЯ
+   ============================================================================ */
+function renderStep6(){
+  const num = State.lastCreatedNumber;
+  return `
+    <div class="card" style="text-align:center;padding:52px 30px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px;">✓</div>
+      <h2 style="font-size:20px;margin-bottom:10px;">Заявка ${num} успешно зарегистрирована</h2>
+      <p style="color:var(--gray-600);font-size:14px;max-width:420px;margin:0 auto 6px;">Заявка будет рассмотрена в течение 5 рабочих дней.</p>
+      <div style="margin:16px 0;"><span class="badge st-yellow">На рассмотрении</span></div>
+      <div class="hero-actions" style="justify-content:center;margin-top:26px;">
+        <button class="btn btn-primary" data-action="nav" data-screen="myRequests">Перейти к моим заявкам</button>
+        <button class="btn btn-secondary" data-action="nav" data-screen="home">На главную</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   РЕНДЕР МАСТЕРА ПОДАЧИ ЗАЯВКИ
+   ============================================================================ */
+function renderWizard(){
+  if(State.wizardStep===6) return renderStep6();
+  let stepHtml = '';
+  if(State.wizardStep===1) stepHtml = renderStep1();
+  else if(State.wizardStep===2) stepHtml = renderStep2();
+  else if(State.wizardStep===3) stepHtml = renderStep3();
+  else if(State.wizardStep===4) stepHtml = renderStep4();
+  else if(State.wizardStep===5) stepHtml = renderStep5();
+
+  const isFirst = State.wizardStep===1;
+  const isLast = State.wizardStep===5;
+  return `
+    <div class="page-head">
+      <div>
+        <h2>${State.editingRequestId?'Дополнение заявки':'Новая заявка на автоматизацию'}</h2>
+        <div class="ph-sub">${State.editingRequestId?'Дополните информацию по запросу администратора и направьте заявку повторно.':'Заполните форму пошагово — на каждом этапе будут подсказки и примеры.'}</div>
+      </div>
+      <div class="autosave-note" id="autosave-note">${State.editingRequestId? '' : '<span>●</span> Черновик сохраняется автоматически'}</div>
+    </div>
+    ${renderStepper()}
+    ${stepHtml}
+    <div class="step-actions">
+      <button class="btn btn-secondary" data-action="wizard-back" ${isFirst?'disabled style="visibility:hidden;"':''}>← Назад</button>
+      ${isLast
+        ? `<button class="btn btn-primary" data-action="wizard-submit">Отправить заявку</button>`
+        : `<button class="btn btn-primary" data-action="wizard-next">Далее →</button>`}
+    </div>
+  `;
+}
+
+/* ============================================================================
+   ВАЛИДАЦИЯ ШАГОВ МАСТЕРА
+   ============================================================================ */
+function validateStep(step){
+  const w = State.wizard, e = {};
+  if(step===1){
+    if(!w.applicant.fio.trim()) e['applicant.fio'] = 'Укажите ФИО';
+    if(!w.applicant.phone.trim()) e['applicant.phone'] = 'Укажите телефон для связи';
+    else if(!isValidPhone(w.applicant.phone)) e['applicant.phone'] = 'Проверьте формат номера телефона';
+    if(!w.applicant.email.trim()) e['applicant.email'] = 'Укажите электронную почту';
+    else if(!isValidEmail(w.applicant.email)) e['applicant.email'] = 'Проверьте формат электронной почты';
+    w.applicant.extraEmails.forEach((em,i)=>{ if(em.trim() && !isValidEmail(em)) e['applicant.extraEmails.'+i] = 'Проверьте формат email'; });
+    if(!w.applicant.department.trim()) e['applicant.department'] = 'Укажите структурное подразделение';
+    if(!w.applicant.consent) e['applicant.consent'] = 'Необходимо подтвердить согласие';
+  }
+  if(step===2){
+    if(!w.type) e['type'] = 'Выберите тип заявки';
+    if(w.type==='upgrade' && !w.existingSystemName.trim()) e['existingSystemName'] = 'Укажите название существующей системы';
+  }
+  if(step===3){
+    if(!w.topic) e['topic'] = 'Выберите тематику';
+    if(w.topic==='Другое' && !w.topicOther.trim()) e['topicOther'] = 'Укажите тематику';
+  }
+  if(step===4){
+    if(!w.process.trim()) e['process'] = 'Опишите текущий процесс';
+    if(!w.problem.trim()) e['problem'] = 'Опишите, что требует автоматизации';
+    if(!w.desiredResult.trim()) e['desiredResult'] = 'Опишите желаемый результат';
+    if(!w.beneficiaries.trim()) e['beneficiaries'] = 'Укажите получателей выгоды';
+    if(!w.resultRecipient.trim()) e['resultRecipient'] = 'Укажите получателя результата';
+  }
+  if(step===5){
+    if(!w.__confirm) e['__confirm'] = 'Необходимо подтвердить, что данные верны';
+  }
+  State.wizardErrors = e;
+  return Object.keys(e).length===0;
+}
+
+/* ============================================================================
+   ОТПРАВКА ЗАЯВКИ
+   ============================================================================ */
+function submitWizard(){
+  const w = State.wizard;
+
+  if(State.editingRequestId){
+    const updated = DataAPI.updateRequest(State.editingRequestId, req=>{
+      req.type = w.type; req.existingSystemName = w.existingSystemName;
+      req.topic = w.topic; req.topicOther = w.topicOther;
+      req.process = w.process; req.problem = w.problem; req.desiredResult = w.desiredResult; req.methodSuggestion = w.methodSuggestion;
+      req.documents = w.documents; req.beneficiaries = w.beneficiaries; req.workload = w.workload; req.resultRecipient = w.resultRecipient;
+      req.applicant = w.applicant;
+      req.status = 'review';
+      req.reviewDueDate = addBusinessDays(new Date(), 5).toISOString();
+      req.history.push({status:'review', comment:'Заявка дополнена заявителем и повторно направлена на рассмотрение.', actor:'Заявитель', ts:nowISO()});
+    });
+    NotifyService.resubmitted(updated);
+    State.lastCreatedNumber = updated.number;
+    State.editingRequestId = null;
+    DataAPI.clearDraft();
+    State.wizardStep = 6;
+    render();
+    return;
+  }
+
+  const req = {
+    id: uid('req'),
+    number: DataAPI.nextNumber(),
+    status: 'review',
+    createdAt: nowISO(),
+    updatedAt: nowISO(),
+    applicant: w.applicant,
+    type: w.type, existingSystemName: w.existingSystemName,
+    topic: w.topic, topicOther: w.topicOther,
+    process: w.process, problem: w.problem, desiredResult: w.desiredResult, methodSuggestion: w.methodSuggestion,
+    documents: w.documents, beneficiaries: w.beneficiaries, workload: w.workload, resultRecipient: w.resultRecipient,
+    responsible: '', deadline: null,
+    reviewDueDate: addBusinessDays(new Date(), 5).toISOString(),
+    history: [
+      {status:'submitted', comment:'', actor:'Заявитель', ts:nowISO()},
+      {status:'review', comment:'', actor:'Система', ts:nowISO()}
+    ]
+  };
+  DataAPI.createRequest(req);
+  NotifyService.requestRegistered(req);
+  DataAPI.clearDraft();
+  State.lastCreatedNumber = req.number;
+  State.wizardStep = 6;
+  render();
+}
+
+/* ============================================================================
+   ЭКРАН «МОИ ЗАЯВКИ»
+   ============================================================================ */
+function requestShortTitle(r){
+  return (r.topic==='Другое'? r.topicOther : r.topic) + ' — ' + (r.process ? r.process.slice(0,60)+(r.process.length>60?'…':'') : '');
+}
+function filteredMyRequests(){
+  const all = DataAPI.listRequests().filter(r=>r.status!=='draft');
+  const f = State.myFilter;
+  return all.filter(r=>{
+    if(f.q && !(r.number.toLowerCase().includes(f.q.toLowerCase()))) return false;
+    if(f.status && r.status!==f.status) return false;
+    if(f.topic && r.topic!==f.topic) return false;
+    return true;
+  }).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+}
+function renderMyRequests(){
+  const list = filteredMyRequests();
+  const f = State.myFilter;
+
+  const statusOptions = Object.entries(STATUSES).filter(([k])=>k!=='draft').map(([k,v])=>`<option value="${k}" ${f.status===k?'selected':''}>${v.label}</option>`).join('');
+  const topicOptions = TOPICS.map(t=>`<option value="${escapeHtml(t)}" ${f.topic===t?'selected':''}>${escapeHtml(t)}</option>`).join('');
+
+  const filtersHtml = `
+    <div class="filters-bar">
+      <input class="input search-input" placeholder="Поиск по номеру заявки" data-filter="my-q" value="${escapeHtml(f.q)}">
+      <select class="select" data-filter="my-status"><option value="">Все статусы</option>${statusOptions}</select>
+      <select class="select" data-filter="my-topic"><option value="">Все тематики</option>${topicOptions}</select>
+    </div>`;
+
+  if(list.length===0 && !f.q && !f.status && !f.topic){
+    return `
+      <div class="page-head"><div><h2>Мои заявки</h2></div></div>
+      <div class="card empty-state">
+        <div class="es-icon">🗂️</div>
+        <h3>У Вас пока нет заявок</h3>
+        <p>Создайте первую заявку на автоматизацию — это займёт всего несколько минут.</p>
+        <button class="btn btn-primary" data-action="new-request">+ Создать первую заявку</button>
+      </div>`;
+  }
+
+  const cards = list.map(r=>`
+    <div class="req-card" data-action="open-request" data-id="${r.id}">
+      <div class="req-card-top">
+        <span class="req-num">${r.number}</span>
+        <span class="badge ${STATUSES[r.status].cls}">${STATUSES[r.status].label}</span>
+      </div>
+      <div class="req-title">${escapeHtml(requestShortTitle(r))}</div>
+      <span class="tag-topic">${escapeHtml(r.topic==='Другое'?r.topicOther:r.topic)}</span>
+      <div class="req-meta-row">
+        <span>Подана: ${fmtDate(r.createdAt)}</span>
+        <span>${r.deadline? 'Срок: '+fmtDate(r.deadline) : 'Изм.: '+fmtDate(r.updatedAt)}</span>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="page-head">
+      <div><h2>Мои заявки</h2><div class="ph-sub">${list.length} заявок(и)</div></div>
+      <button class="btn btn-primary" data-action="new-request">+ Создать заявку</button>
+    </div>
+    ${filtersHtml}
+    ${list.length? `<div class="req-grid">${cards}</div>` : `<div class="card empty-state"><div class="es-icon">🔍</div><h3>Ничего не найдено</h3><p>Попробуйте изменить условия поиска или фильтры.</p></div>`}
+  `;
+}
+
+/* ============================================================================
+   ТАЙМЛАЙН ЖИЗНЕННОГО ЦИКЛА ЗАЯВКИ
+   ============================================================================ */
+function renderLifecycle(r){
+  const labels = { submitted:'Отправлена', review:'На рассмотрении', accepted:'Принята в работу', development:'В разработке', testing:'Тестирование', done:'Готово', closed:'Закрыта' };
+  let currentIdx = LIFECYCLE_ORDER.indexOf(r.status);
+  if(r.status==='clarification'){
+    // остаёмся визуально на этапе "На рассмотрении", с боковой веткой уточнения
+    currentIdx = LIFECYCLE_ORDER.indexOf('review');
+  }
+  if(r.status==='rejected'){
+    currentIdx = LIFECYCLE_ORDER.indexOf('submitted');
+  }
+
+  const items = LIFECYCLE_ORDER.map((key,i)=>{
+    let cls='lc-item';
+    if(r.status!=='rejected'){
+      if(i < currentIdx || (i===currentIdx && r.status!=='clarification' && key===r.status) ) cls += (i<currentIdx?' done':' current');
+      else if(i===currentIdx) cls += ' current';
+    }
+    const dotContent = (cls.includes('done')) ? '✓' : (i+1);
+    return `<div class="${cls}"><div class="lc-line"></div><div class="lc-dot">${dotContent}</div><div class="lc-label">${labels[key]}</div></div>`;
+  }).join('');
+
+  let branch = '';
+  if(r.status==='clarification'){
+    branch = `<div class="lc-branch orange">⚠ <div>Заявка находится на статусе <b>«Требуется уточнение»</b>. После дополнения информации она вернётся на рассмотрение.</div></div>`;
+  } else if(r.status==='rejected'){
+    branch = `<div class="lc-branch red">✕ <div>Заявка была <b>отклонена</b> на этапе рассмотрения.</div></div>`;
+  }
+
+  return `<div class="lifecycle">${items}</div>${branch}`;
+}
+
+/* ============================================================================
+   ДЕТАЛЬНАЯ КАРТОЧКА ЗАЯВКИ (ОБЩАЯ ЧАСТЬ ДЛЯ ОБЕИХ РОЛЕЙ)
+   ============================================================================ */
+function renderRequestOverview(r){
+  const workloadResult = calcWorkload(r.workload);
+  return `
+    <div class="card">
+      <div class="subhead" style="margin-top:0;">Данные заявителя</div>
+      <div class="kv-row"><div class="k">ФИО</div><div class="v">${escapeHtml(r.applicant.fio)}</div></div>
+      <div class="kv-row"><div class="k">Телефон</div><div class="v">${escapeHtml(r.applicant.phone)}</div></div>
+      <div class="kv-row"><div class="k">Email</div><div class="v">${escapeHtml(r.applicant.email)}</div></div>
+      <div class="kv-row"><div class="k">Регион</div><div class="v">${escapeHtml(r.applicant.region)}</div></div>
+      <div class="kv-row"><div class="k">Подразделение</div><div class="v">${escapeHtml(r.applicant.department)}</div></div>
+
+      <div class="subhead">Заявка</div>
+      <div class="kv-row"><div class="k">Тип</div><div class="v">${r.type==='upgrade'?'Доработка существующей автоматизации':'Новая автоматизация'}</div></div>
+      ${r.type==='upgrade'?`<div class="kv-row"><div class="k">Существующая система</div><div class="v">${escapeHtml(r.existingSystemName)}</div></div>`:''}
+      <div class="kv-row"><div class="k">Тематика</div><div class="v">${escapeHtml(r.topic==='Другое'?r.topicOther:r.topic)}</div></div>
+
+      <div class="subhead">Текущий процесс</div><p style="font-size:13px;">${escapeHtml(r.process)}</p>
+      <div class="subhead">Требует автоматизации</div><p style="font-size:13px;">${escapeHtml(r.problem)}</p>
+      <div class="subhead">Желаемый результат</div><p style="font-size:13px;">${escapeHtml(r.desiredResult)}</p>
+      ${r.methodSuggestion?`<div class="subhead">Предложение по способу автоматизации</div><p style="font-size:13px;">${escapeHtml(r.methodSuggestion)}</p>`:''}
+
+      <div class="subhead">Документы</div>
+      ${r.documents && r.documents.length ? r.documents.map(d=>`
+        <div class="kv-row" style="align-items:flex-start;"><div class="k">${escapeHtml(d.name)}<br><span style="color:var(--gray-400);">${d.sizeLabel}</span></div><div class="v" style="text-align:left;">${escapeHtml(d.usage)||'—'}<br><span style="color:var(--gray-500);font-weight:400;">${escapeHtml(d.futureUse)||''}</span></div></div>
+      `).join('') : '<p style="font-size:13px;color:var(--gray-500);">Документы не прикреплены</p>'}
+
+      <div class="subhead">Получатели выгоды</div><p style="font-size:13px;">${escapeHtml(r.beneficiaries)}</p>
+
+      <div class="subhead">Трудоёмкость</div>
+      <div class="kv-row"><div class="k">Периодичность</div><div class="v">${escapeHtml(r.workload.frequency==='другое'?r.workload.frequencyOther:r.workload.frequency)||'—'}</div></div>
+      <div class="kv-row"><div class="k">Время на операцию</div><div class="v">${r.workload.duration||'—'} ${DURATION_UNITS[r.workload.durationUnit]||''}</div></div>
+      <div class="kv-row"><div class="k">Раз за период</div><div class="v">${r.workload.timesPerPeriod||'—'}</div></div>
+      <div class="kv-row"><div class="k">Сотрудников</div><div class="v">${r.workload.employeesCount||'—'}</div></div>
+      ${workloadResult!==null?`<div class="kv-row"><div class="k">Ориентировочно</div><div class="v">${workloadResult} чел.-часов</div></div>`:''}
+
+      <div class="subhead">Получатель результата</div><p style="font-size:13px;">${escapeHtml(r.resultRecipient)}</p>
+    </div>
+  `;
+}
+function renderHistoryCard(r){
+  const items = r.history.slice().reverse().map(h=>`
+    <div class="history-item">
+      <div class="history-dot"></div>
+      <div class="history-time">${fmtDateTime(h.ts)}</div>
+      <div>
+        <div><span class="badge ${STATUSES[h.status].cls}" style="margin-right:6px;">${STATUSES[h.status].label}</span><span style="color:var(--gray-500);">${h.actor}</span></div>
+        ${h.comment?`<div style="margin-top:5px;color:var(--charcoal);">${escapeHtml(h.comment)}</div>`:''}
+      </div>
+    </div>`).join('');
+  return `<div class="card"><div class="section-title">История изменений</div>${items}</div>`;
+}
+
+/* ---- экран заявителя: детальная заявка ---- */
+function renderApplicantRequestDetail(){
+  const r = DataAPI.getRequest(State.selectedId);
+  if(!r) return `<div class="card empty-state"><h3>Заявка не найдена</h3><button class="btn btn-secondary" data-action="nav" data-screen="myRequests">← К списку заявок</button></div>`;
+
+  const lastComment = r.history.slice().reverse().find(h=>h.comment);
+  return `
+    <button class="btn btn-ghost btn-sm" data-action="nav" data-screen="myRequests" style="margin-bottom:14px;">← К списку заявок</button>
+    <div class="page-head">
+      <div>
+        <h2>Заявка ${r.number}</h2>
+        <div class="ph-sub">Подана ${fmtDate(r.createdAt)} · ${escapeHtml(r.topic==='Другое'?r.topicOther:r.topic)}</div>
+      </div>
+      <span class="badge ${STATUSES[r.status].cls}" style="font-size:13px;padding:8px 14px;">${STATUSES[r.status].label}</span>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Ход рассмотрения</div>
+      ${renderLifecycle(r)}
+      ${r.deadline ? `<div class="info-strip" style="margin-top:12px;"><div class="ii">📅</div><div>Ориентировочный срок реализации: <b>${fmtDate(r.deadline)}</b><br><span style="color:var(--gray-500);font-size:11.5px;">Срок ориентировочный и может измениться в ходе работы.</span></div></div>` : ''}
+      ${r.status==='review' ? `<div class="info-strip" style="margin-top:12px;"><div class="ii">⏳</div><div>Рассмотреть до: <b>${fmtDate(r.reviewDueDate)}</b></div></div>` : ''}
+    </div>
+
+    ${r.status==='clarification' ? `
+      <div class="card" style="border-color:var(--orange);background:var(--orange-bg);">
+        <div class="section-title">Запрошено уточнение</div>
+        <p style="font-size:13.5px;margin-bottom:14px;">${escapeHtml(lastComment ? lastComment.comment : '')}</p>
+        <button class="btn btn-dark" data-action="resume-clarification" data-id="${r.id}">Дополнить заявку и отправить повторно</button>
+      </div>` : ''}
+
+    <div class="detail-grid" style="margin-top:16px;">
+      <div>${renderRequestOverview(r)}</div>
+      <div>${renderHistoryCard(r)}</div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   АДМИН — ДАШБОРД
+   ============================================================================ */
+function isOverdueReview(r){
+  return ['review','clarification'].includes(r.status) && new Date(r.reviewDueDate) < new Date();
+}
+function isDueSoon(r){
+  if(!['review','clarification'].includes(r.status)) return false;
+  const diff = (new Date(r.reviewDueDate) - new Date()) / (1000*60*60*24);
+  return diff >= 0 && diff <= 1.5;
+}
+function renderAdminDashboard(){
+  const all = DataAPI.listRequests();
+  const total = all.length;
+  const fresh = all.filter(r=>r.status==='review' && r.history.length===2).length;
+  const review = all.filter(r=>r.status==='review').length;
+  const clarification = all.filter(r=>r.status==='clarification').length;
+  const inWork = all.filter(r=>['accepted','development','testing'].includes(r.status)).length;
+  const finished = all.filter(r=>['done','closed'].includes(r.status)).length;
+  const overdue = all.filter(isOverdueReview).length;
+
+  const byTopic = {};
+  all.forEach(r=>{ const t = r.topic==='Другое'?(r.topicOther||'Другое'):r.topic; byTopic[t]=(byTopic[t]||0)+1; });
+  const maxTopic = Math.max(1, ...Object.values(byTopic));
+  const barsHtml = Object.entries(byTopic).sort((a,b)=>b[1]-a[1]).map(([topic,count])=>`
+    <div class="bar-row">
+      <div class="bar-label">${escapeHtml(topic)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(count/maxTopic*100)}%"></div></div>
+      <div class="bar-value">${count}</div>
+    </div>`).join('') || '<p style="font-size:13px;color:var(--gray-500);">Нет данных</p>';
+
+  const workloadVals = all.map(r=>calcWorkload(r.workload)).filter(v=>v!==null);
+  const avgWorkload = workloadVals.length ? Math.round((workloadVals.reduce((a,b)=>a+b,0)/workloadVals.length)*10)/10 : null;
+
+  return `
+    <div class="page-head">
+      <div><h2>Дашборд администратора</h2><div class="ph-sub">Сводная статистика по заявкам на автоматизацию</div></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card accent"><div class="kpi-value">${total}</div><div class="kpi-label">Всего заявок</div></div>
+      <div class="kpi-card"><div class="kpi-value">${fresh}</div><div class="kpi-label">Новые</div></div>
+      <div class="kpi-card"><div class="kpi-value">${review}</div><div class="kpi-label">На рассмотрении</div></div>
+      <div class="kpi-card"><div class="kpi-value">${clarification}</div><div class="kpi-label">Требуют уточнения</div></div>
+      <div class="kpi-card"><div class="kpi-value">${inWork}</div><div class="kpi-label">В работе</div></div>
+      <div class="kpi-card"><div class="kpi-value">${finished}</div><div class="kpi-label">Завершено</div></div>
+      <div class="kpi-card warn"><div class="kpi-value">${overdue}</div><div class="kpi-label">Просрочено</div></div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="card">
+        <div class="section-title">Заявки по тематикам</div>
+        <div class="section-sub">Построено на основе фактических данных</div>
+        ${barsHtml}
+      </div>
+      <div class="card">
+        <div class="section-title">Дополнительно</div>
+        <div class="kv-row"><div class="k">Средняя трудоёмкость</div><div class="v">${avgWorkload!==null? avgWorkload+' ч.':'—'}</div></div>
+        <div class="kv-row"><div class="k">Новых заявок</div><div class="v">${fresh}</div></div>
+        <div class="kv-row"><div class="k">В работе</div><div class="v">${inWork}</div></div>
+        <div class="kv-row"><div class="k">Завершено</div><div class="v">${finished}</div></div>
+        <div class="kv-row"><div class="k">Просрочено</div><div class="v" style="color:var(--red);">${overdue}</div></div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:14px;" data-action="nav" data-screen="adminRegistry">Открыть реестр заявок →</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   АДМИН — РЕЕСТР ЗАЯВОК
+   ============================================================================ */
+function filteredRegistry(){
+  const all = DataAPI.listRequests();
+  const f = State.regFilter;
+  let list = all.filter(r=>{
+    if(f.q){
+      const q = f.q.toLowerCase();
+      if(!(r.number.toLowerCase().includes(q) || r.applicant.fio.toLowerCase().includes(q))) return false;
+    }
+    if(f.status && r.status!==f.status) return false;
+    if(f.topic && r.topic!==f.topic) return false;
+    if(f.region && r.applicant.region!==f.region) return false;
+    return true;
+  });
+  list.sort((a,b)=>{
+    let av, bv;
+    if(f.sortBy==='createdAt'){ av=new Date(a.createdAt); bv=new Date(b.createdAt); }
+    else if(f.sortBy==='number'){ av=a.number; bv=b.number; }
+    else if(f.sortBy==='status'){ av=STATUSES[a.status].label; bv=STATUSES[b.status].label; }
+    else { av=a[f.sortBy]||''; bv=b[f.sortBy]||''; }
+    if(av<bv) return f.sortDir==='asc'?-1:1;
+    if(av>bv) return f.sortDir==='asc'?1:-1;
+    return 0;
+  });
+  return list;
+}
+function renderAdminRegistry(){
+  const list = filteredRegistry();
+  const f = State.regFilter;
+  const statusOptions = Object.entries(STATUSES).filter(([k])=>k!=='draft').map(([k,v])=>`<option value="${k}" ${f.status===k?'selected':''}>${v.label}</option>`).join('');
+  const topicOptions = TOPICS.map(t=>`<option value="${escapeHtml(t)}" ${f.topic===t?'selected':''}>${escapeHtml(t)}</option>`).join('');
+  const regionOptions = REGIONS.map(r=>`<option value="${escapeHtml(r)}" ${f.region===r?'selected':''}>${escapeHtml(r)}</option>`).join('');
+
+  const rows = list.map(r=>{
+    let rowCls = '';
+    if(isOverdueReview(r)) rowCls = 'row-overdue';
+    else if(isDueSoon(r)) rowCls = 'row-warning';
+    return `
+      <tr class="${rowCls}" data-action="open-admin-request" data-id="${r.id}" style="cursor:pointer;">
+        <td class="mono-num">${r.number}</td>
+        <td>${fmtDate(r.createdAt)}</td>
+        <td>${escapeHtml(r.applicant.fio)}</td>
+        <td>${escapeHtml(r.applicant.region)}</td>
+        <td>${escapeHtml(r.applicant.department)}</td>
+        <td>${r.type==='upgrade'?'Доработка':'Новая'}</td>
+        <td>${escapeHtml(r.topic==='Другое'?r.topicOther:r.topic)}</td>
+        <td><span class="badge ${STATUSES[r.status].cls}">${STATUSES[r.status].label}</span></td>
+        <td>${r.deadline? fmtDate(r.deadline) : (['review','clarification'].includes(r.status)? fmtDate(r.reviewDueDate) : '—')}</td>
+        <td>${escapeHtml(r.responsible)||'—'}</td>
+        <td><button class="btn btn-ghost btn-sm" data-action="open-admin-request" data-id="${r.id}">Открыть →</button></td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <div class="page-head">
+      <div><h2>Реестр заявок</h2><div class="ph-sub">${list.length} заявок(и)</div></div>
+    </div>
+    <div class="filters-bar">
+      <input class="input search-input" placeholder="Поиск по номеру или ФИО" data-filter="reg-q" value="${escapeHtml(f.q)}">
+      <select class="select" data-filter="reg-status"><option value="">Все статусы</option>${statusOptions}</select>
+      <select class="select" data-filter="reg-topic"><option value="">Все тематики</option>${topicOptions}</select>
+      <select class="select" data-filter="reg-region"><option value="">Все регионы</option>${regionOptions}</select>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="table-wrap">
+        <table class="reg-table">
+          <thead><tr>
+            <th data-sort="number">№ заявки</th><th data-sort="createdAt">Дата</th><th>Заявитель</th><th>Регион</th><th>Подразделение</th>
+            <th>Тип</th><th>Тематика</th><th data-sort="status">Статус</th><th>Срок</th><th>Ответственный</th><th></th>
+          </tr></thead>
+          <tbody>${rows || `<tr><td colspan="11" style="text-align:center;color:var(--gray-500);padding:34px;">Заявки не найдены</td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:12px;">🟧 Строка выделена — приближается срок рассмотрения (5 рабочих дней). 🟥 Строка выделена — срок рассмотрения просрочен.</div>
+  `;
+}
+
+/* ============================================================================
+   АДМИН — КАРТОЧКА ЗАЯВКИ
+   ============================================================================ */
+function renderAdminActions(r){
+  if(r.status==='review' || r.status==='clarification'){
+    return `
+      <div class="card">
+        <div class="section-title">Действия</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn btn-primary btn-block" data-action="admin-accept" data-id="${r.id}">Принять в работу</button>
+          <button class="btn btn-secondary btn-block" data-action="admin-clarify" data-id="${r.id}">Запросить уточнение</button>
+          <button class="btn btn-danger btn-block" data-action="admin-reject" data-id="${r.id}">Отклонить</button>
+        </div>
+      </div>`;
+  }
+  if(['accepted','development','testing','done'].includes(r.status)){
+    const next = FORWARD_TRANSITIONS[r.status];
+    if(!next) return '';
+    return `
+      <div class="card">
+        <div class="section-title">Изменение статуса</div>
+        <p style="font-size:12.5px;color:var(--gray-600);margin-bottom:12px;">Текущий статус: <b>${STATUSES[r.status].label}</b></p>
+        <button class="btn btn-primary btn-block" data-action="admin-advance" data-id="${r.id}" data-next="${next}">Перевести в статус «${STATUSES[next].label}»</button>
+      </div>`;
+  }
+  return '';
+}
+function renderAdminSidebar(r){
+  return `
+    <div class="card">
+      <div class="section-title">Управление</div>
+      <div class="kv-row"><div class="k">Статус</div><div class="v"><span class="badge ${STATUSES[r.status].cls}">${STATUSES[r.status].label}</span></div></div>
+      <div class="kv-row"><div class="k">Ответственный</div><div class="v">${escapeHtml(r.responsible)||'—'}</div></div>
+      <div class="kv-row"><div class="k">Ориент. срок</div><div class="v">${r.deadline?fmtDate(r.deadline):'—'}</div></div>
+      <div class="kv-row"><div class="k">Рассмотреть до</div><div class="v">${fmtDate(r.reviewDueDate)}</div></div>
+    </div>
+    ${renderAdminActions(r)}
+  `;
+}
+function renderAdminRequestDetail(){
+  const r = DataAPI.getRequest(State.selectedId);
+  if(!r) return `<div class="card empty-state"><h3>Заявка не найдена</h3><button class="btn btn-secondary" data-action="nav" data-screen="adminRegistry">← К реестру</button></div>`;
+  return `
+    <button class="btn btn-ghost btn-sm" data-action="nav" data-screen="adminRegistry" style="margin-bottom:14px;">← К реестру заявок</button>
+    <div class="page-head">
+      <div><h2>Заявка ${r.number}</h2><div class="ph-sub">Подана ${fmtDate(r.createdAt)} заявителем ${escapeHtml(r.applicant.fio)}</div></div>
+      <span class="badge ${STATUSES[r.status].cls}" style="font-size:13px;padding:8px 14px;">${STATUSES[r.status].label}</span>
+    </div>
+    <div class="card">
+      <div class="section-title">Жизненный цикл</div>
+      ${renderLifecycle(r)}
+    </div>
+    <div class="detail-grid" style="margin-top:16px;">
+      <div>
+        ${renderRequestOverview(r)}
+        ${renderHistoryCard(r)}
+      </div>
+      <div>${renderAdminSidebar(r)}</div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   МОДАЛЬНЫЕ ОКНА ДЕЙСТВИЙ АДМИНИСТРАТОРА
+   ============================================================================ */
+function openAcceptModal(id){
+  const min = new Date().toISOString().slice(0,10);
+  openModal(`
+    <h3>Принять заявку в работу</h3>
+    <div class="modal-sub">Укажите ориентировочный срок реализации и ответственного. Комментарий необязателен — он будет виден заявителю.</div>
+    ${fieldText({label:'Ориентировочный срок реализации', path:'', value:'', type:'date'}).replace('data-field=""','id="modal-deadline"').replace('value=""',`value=""`)}
+    ${fieldText({label:'Ответственный сотрудник / команда', path:'', value:'', placeholder:'Например: Группа развития информационных систем'}).replace('data-field=""','id="modal-responsible"')}
+    ${fieldTextarea({label:'Комментарий (необязательно)', path:'', value:'', rows:3}).replace('data-field=""','id="modal-comment"')}
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-close">Отмена</button>
+      <button class="btn btn-primary" data-action="confirm-accept" data-id="${id}">Принять в работу</button>
+    </div>
+  `);
+  document.getElementById('modal-deadline').min = min;
+}
+function openClarifyModal(id){
+  openModal(`
+    <h3>Запросить уточнение</h3>
+    <div class="modal-sub">Опишите, какая информация требуется от заявителя. Комментарий обязателен и будет виден заявителю.</div>
+    ${fieldTextarea({label:'Комментарий / вопрос', path:'', value:'', rows:4, placeholder:'Например: просьба приложить пример отчёта, который сейчас формируется вручную.'}).replace('data-field=""','id="modal-comment"')}
+    <div id="modal-err" class="field-error" style="display:none;">⚠ Комментарий обязателен</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-close">Отмена</button>
+      <button class="btn btn-primary" data-action="confirm-clarify" data-id="${id}">Запросить уточнение</button>
+    </div>
+  `);
+}
+function openRejectModal(id){
+  openModal(`
+    <h3>Отклонить заявку</h3>
+    <div class="modal-sub">Укажите причину отклонения. Она будет видна заявителю.</div>
+    ${fieldTextarea({label:'Причина отклонения', path:'', value:'', rows:4}).replace('data-field=""','id="modal-comment"')}
+    <div id="modal-err" class="field-error" style="display:none;">⚠ Укажите причину отклонения</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-close">Отмена</button>
+      <button class="btn btn-danger" data-action="confirm-reject" data-id="${id}">Отклонить заявку</button>
+    </div>
+  `);
+}
+function openAdvanceModal(id, next){
+  openModal(`
+    <h3>Изменить статус на «${STATUSES[next].label}»</h3>
+    <div class="modal-sub">Можно оставить комментарий — он будет добавлен в историю и виден заявителю.</div>
+    ${fieldTextarea({label:'Комментарий (необязательно)', path:'', value:'', rows:3}).replace('data-field=""','id="modal-comment"')}
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-close">Отмена</button>
+      <button class="btn btn-primary" data-action="confirm-advance" data-id="${id}" data-next="${next}">Изменить статус</button>
+    </div>
+  `);
+}
+function openResetConfirmModal(){
+  openModal(`
+    <h3>Сбросить демонстрационные данные?</h3>
+    <div class="modal-sub">Все текущие заявки и черновики будут удалены и заменены исходным демонстрационным набором. Это действие необратимо.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-close">Отмена</button>
+      <button class="btn btn-danger" data-action="confirm-reset-data">Сбросить данные</button>
+    </div>
+  `);
+}
+
+/* ============================================================================
+   ГЛАВНЫЙ РЕНДЕР
+   ============================================================================ */
+function render(){
+  renderHeader();
+  const root = document.getElementById('app-root');
+  let html = '';
+  switch(State.screen){
+    case 'home': html = renderHome(); break;
+    case 'wizard': html = renderWizard(); break;
+    case 'myRequests': html = renderMyRequests(); break;
+    case 'requestDetail': html = renderApplicantRequestDetail(); break;
+    case 'adminDashboard': html = renderAdminDashboard(); break;
+    case 'adminRegistry': html = renderAdminRegistry(); break;
+    case 'adminRequestDetail': html = renderAdminRequestDetail(); break;
+    default: html = renderHome();
+  }
+  root.innerHTML = html;
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+/* ============================================================================
+   НАВИГАЦИЯ / ДЕЙСТВИЯ
+   ============================================================================ */
+function goto(screen){ State.screen = screen; render(); }
+
+function startNewRequest(){
+  const draft = DataAPI.getDraft();
+  if(draft){
+    State.wizard = draft;
+  } else {
+    State.wizard = newWizardData();
+  }
+  State.editingRequestId = null;
+  State.wizardStep = 1;
+  State.wizardErrors = {};
+  State.screen = 'wizard';
+  render();
+}
+function continueDraft(){
+  State.wizard = DataAPI.getDraft() || newWizardData();
+  State.editingRequestId = null;
+  State.wizardStep = 1;
+  State.wizardErrors = {};
+  State.screen = 'wizard';
+  render();
+}
+function discardDraft(){ DataAPI.clearDraft(); render(); }
+
+let autosaveTimer = null;
+function autosaveDraft(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(()=>{
+    if(State.wizard && !State.editingRequestId){
+      DataAPI.saveDraft(State.wizard);
+      const note = document.getElementById('autosave-note');
+      if(note) note.innerHTML = '<span>✓</span> Черновик сохранён';
+    }
+  }, 500);
+}
+
+/* ============================================================================
+   ОБРАБОТКА СОБЫТИЙ (делегирование)
+   ============================================================================ */
+document.addEventListener('input', function(e){
+  const t = e.target;
+  const path = t.dataset.field;
+  if(!path) return;
+
+  if(State.wizard){
+    if(path.startsWith('documents:')){
+      const [,docId,key] = path.split(':');
+      const doc = State.wizard.documents.find(d=>d.id===docId);
+      if(doc) doc[key] = t.value;
+    } else if(path.startsWith('applicant.extraEmails.')){
+      const idx = parseInt(path.split('.').pop(),10);
+      State.wizard.applicant.extraEmails[idx] = t.value;
+    } else if(path !== '__confirm'){
+      setDeep(State.wizard, path, t.value);
+    }
+    autosaveDraft();
+    // Пересчёт трудоёмкости на 4-м шаге отображается в info-strip — обновим карточку без потери фокуса на других полях,
+    // только если событие пришло из полей трудоёмкости.
+  }
+  // Фильтры "Мои заявки"
+  if(t.dataset.filter==='my-q'){ State.myFilter.q = t.value; renderMyRequestsSoft(); }
+  if(t.dataset.filter==='reg-q'){ State.regFilter.q = t.value; renderRegistrySoft(); }
+});
+
+function renderMyRequestsSoft(){ if(State.screen==='myRequests') render(); }
+function renderRegistrySoft(){ if(State.screen==='adminRegistry') render(); }
+
+document.addEventListener('change', function(e){
+  const t = e.target;
+  const path = t.dataset.field;
+  if(path && State.wizard){
+    if(path==='applicant.consent'){ State.wizard.applicant.consent = t.checked; render(); return; }
+    if(path==='__confirm'){ State.wizard.__confirm = t.checked; return; }
+    setDeep(State.wizard, path, t.value);
+    autosaveDraft();
+    if(path==='type' || path==='topic' || path==='workload.frequency' || path==='workload.durationUnit'){ render(); }
+    else if(path.startsWith('workload.')){ render(); }
+    return;
+  }
+  if(t.dataset.filter){
+    const map = {
+      'my-status':()=>State.myFilter.status=t.value,
+      'my-topic':()=>State.myFilter.topic=t.value,
+      'reg-status':()=>State.regFilter.status=t.value,
+      'reg-topic':()=>State.regFilter.topic=t.value,
+      'reg-region':()=>State.regFilter.region=t.value
+    };
+    if(map[t.dataset.filter]){ map[t.dataset.filter](); render(); }
+    return;
+  }
+  if(t.dataset.action==='file-input'){ handleFiles(t.files); }
+});
+
+document.addEventListener('dragover', function(e){
+  const dz = e.target.closest && e.target.closest('#dropzone');
+  if(dz){ e.preventDefault(); dz.classList.add('drag'); }
+});
+document.addEventListener('dragleave', function(e){
+  const dz = e.target.closest && e.target.closest('#dropzone');
+  if(dz){ dz.classList.remove('drag'); }
+});
+document.addEventListener('drop', function(e){
+  const dz = e.target.closest && e.target.closest('#dropzone');
+  if(dz){
+    e.preventDefault(); dz.classList.remove('drag');
+    if(e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+  }
+});
+function handleFiles(fileList){
+  if(!State.wizard || !fileList || !fileList.length) return;
+  Array.from(fileList).forEach(f=>{
+    State.wizard.documents.push({ id: uid('doc'), name: f.name, ext: fileExt(f.name), sizeLabel: fileSizeLabel(f.size), usage:'', futureUse:'' });
+  });
+  autosaveDraft();
+  render();
+}
+
+document.addEventListener('click', function(e){
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const action = el.dataset.action;
+
+  switch(action){
+    case 'nav': goto(el.dataset.screen); break;
+    case 'set-role':
+      State.role = el.dataset.role;
+      State.screen = State.role==='admin' ? 'adminDashboard' : 'home';
+      render();
+      break;
+    case 'reset-data': openResetConfirmModal(); break;
+    case 'confirm-reset-data': closeModal(); resetDemoData(); break;
+    case 'modal-close': case 'modal-overlay': closeModal(); break;
+
+    case 'new-request': startNewRequest(); break;
+    case 'continue-draft': continueDraft(); break;
+    case 'discard-draft': discardDraft(); break;
+
+    case 'add-extra-email': State.wizard.applicant.extraEmails.push(''); render(); break;
+    case 'remove-extra-email': State.wizard.applicant.extraEmails.splice(parseInt(el.dataset.index,10),1); autosaveDraft(); render(); break;
+    case 'remove-doc': State.wizard.documents = State.wizard.documents.filter(d=>d.id!==el.dataset.docid); autosaveDraft(); render(); break;
+
+    case 'pick-type': State.wizard.type = el.dataset.value; autosaveDraft(); render(); break;
+    case 'pick-topic': State.wizard.topic = el.dataset.value; autosaveDraft(); render(); break;
+
+    case 'wizard-back':
+      State.wizardStep = Math.max(1, State.wizardStep-1);
+      State.wizardErrors = {};
+      render();
+      break;
+    case 'wizard-next':
+      if(validateStep(State.wizardStep)){ State.wizardStep++; render(); } else { render(); }
+      break;
+    case 'wizard-submit':
+      if(validateStep(5)){ submitWizard(); } else { render(); }
+      break;
+    case 'edit-step': State.wizardStep = parseInt(el.dataset.step,10); State.wizardErrors={}; render(); break;
+
+    case 'open-request': State.selectedId = el.dataset.id; State.screen = 'requestDetail'; render(); break;
+    case 'resume-clarification': {
+      const r = DataAPI.getRequest(el.dataset.id);
+      State.wizard = {
+        applicant: JSON.parse(JSON.stringify(r.applicant)),
+        type: r.type, existingSystemName: r.existingSystemName,
+        topic: r.topic, topicOther: r.topicOther,
+        process: r.process, problem: r.problem, desiredResult: r.desiredResult, methodSuggestion: r.methodSuggestion,
+        documents: JSON.parse(JSON.stringify(r.documents||[])),
+        beneficiaries: r.beneficiaries,
+        workload: JSON.parse(JSON.stringify(r.workload)),
+        resultRecipient: r.resultRecipient,
+        __confirm:false
+      };
+      State.editingRequestId = r.id;
+      State.wizardStep = 4;
+      State.wizardErrors = {};
+      State.screen = 'wizard';
+      render();
+      break;
+    }
+
+    case 'open-admin-request': State.selectedId = el.dataset.id; State.screen = 'adminRequestDetail'; render(); break;
+
+    case 'admin-accept': openAcceptModal(el.dataset.id); break;
+    case 'admin-clarify': openClarifyModal(el.dataset.id); break;
+    case 'admin-reject': openRejectModal(el.dataset.id); break;
+    case 'admin-advance': openAdvanceModal(el.dataset.id, el.dataset.next); break;
+
+    case 'confirm-accept': {
+      const id = el.dataset.id;
+      const deadline = document.getElementById('modal-deadline').value;
+      const responsible = document.getElementById('modal-responsible').value;
+      const comment = document.getElementById('modal-comment').value;
+      const updated = DataAPI.updateRequest(id, req=>{
+        const old = req.status;
+        req.status = 'accepted';
+        req.deadline = deadline ? new Date(deadline).toISOString() : null;
+        req.responsible = responsible;
+        req.history.push({status:'accepted', comment, actor:'Администратор', ts:nowISO()});
+      });
+      closeModal();
+      NotifyService.statusChanged(updated, 'review', 'accepted');
+      render();
+      break;
+    }
+    case 'confirm-clarify': {
+      const id = el.dataset.id;
+      const comment = document.getElementById('modal-comment').value.trim();
+      if(!comment){ document.getElementById('modal-err').style.display='flex'; break; }
+      const updated = DataAPI.updateRequest(id, req=>{
+        req.status = 'clarification';
+        req.history.push({status:'clarification', comment, actor:'Администратор', ts:nowISO()});
+      });
+      closeModal();
+      NotifyService.clarificationRequested(updated);
+      render();
+      break;
+    }
+    case 'confirm-reject': {
+      const id = el.dataset.id;
+      const comment = document.getElementById('modal-comment').value.trim();
+      if(!comment){ document.getElementById('modal-err').style.display='flex'; break; }
+      const updated = DataAPI.updateRequest(id, req=>{
+        req.status = 'rejected';
+        req.history.push({status:'rejected', comment, actor:'Администратор', ts:nowISO()});
+      });
+      closeModal();
+      NotifyService.statusChanged(updated, updated.status, 'rejected');
+      render();
+      break;
+    }
+    case 'confirm-advance': {
+      const id = el.dataset.id, next = el.dataset.next;
+      const comment = document.getElementById('modal-comment').value;
+      let oldStatus;
+      const updated = DataAPI.updateRequest(id, req=>{
+        oldStatus = req.status;
+        req.status = next;
+        req.history.push({status:next, comment, actor:'Администратор', ts:nowISO()});
+      });
+      closeModal();
+      NotifyService.statusChanged(updated, oldStatus, next);
+      render();
+      break;
+    }
+  }
+});
+
+/* ============================================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================================ */
+function init(){
+  seedDemoData();
+  render();
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
